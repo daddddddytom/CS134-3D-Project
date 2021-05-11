@@ -1,47 +1,69 @@
 #include "EntityBase.h"
 
-float EntityBase::getRotation() {
-	return this->rotation;
+EntityBase::EntityBase(string fileName) {
+	if (!this->loadModel(fileName, true)) {
+		cout << "cannot load " << fileName << endl;
+		ofExit(1);
+	}
+	this->setScaleNormalization(false);
+	this->hitbox = Box::meshBounds(this->getMesh(0));
 }
 
-void EntityBase::setRotation(float rotation) {
-	float oldRotation = this->rotation;
-	this->rotation = rotation;
-	this->velocity = glm::rotate(glm::mat4(1.0f), glm::radians(rotation - oldRotation), glm::vec4(0, 0, 1)) * glm::vec4(this->velocity, 0);
+EntityBase::EntityBase(const EntityBase& original) {
+	// minimum functionality as fail safe, but please avoid using this at all cost.
+	cout << "Warning: Copy ctor for EntityBase called. Consider using object reference instead." << endl;
+	this->hitbox = original.hitbox;
+	this->setPosition(original.pos.x, original.pos.y, original.pos.z);
 }
 
-glm::vec4 EntityBase::getScale() {
-	return this->scale;
+bool EntityBase::inside(const glm::vec3& p) const {
+	return hitbox.inside(p);
 }
 
-void EntityBase::setScale(glm::vec4 scale) {
-	this->scale = scale;
+bool EntityBase::inside(const glm::vec3* points, int size) const {
+	return hitbox.inside(points, size);
+}
+
+bool EntityBase::intersect(const Ray& ray) {
+	return hitbox.intersect(ray, 0, std::numeric_limits<float>::infinity());
+}
+
+bool EntityBase::overlap(const Box& box) {
+	return hitbox.overlap(box);
+}
+
+void EntityBase::integrate() {
+	// delta time
+	float dt = 1.0 / ofGetFrameRate();
+
+	// s(t) = vt
+	pos += velocity * dt;
+
+	// F = ma; a = F/m
+	ofVec3f accel = (forces / mass);
+
+	// v(t + dt) = v(t) + a(t) * dt 
+	velocity += accel * dt;
+
+	// angular accel = torque / I (completely arbitrary)
+	glm::vec3 angularAccel = 1000 * torque / mass;
+
+	// update dTheta
+	dTheta += angularAccel;
+
+	// angular velocity = change in theta / change in time
+	this->setRotation(0, dTheta.x, 1, 0, 0);
+	this->setRotation(1, dTheta.y, 0, 1, 0);
+	this->setRotation(2, dTheta.z, 0, 0, 1);
+
+	// damping
+	velocity *= damping;
+	dTheta *= damping;
+
+	// clear forces
+	forces = glm::vec3(0, 0, 0);
+	torque = glm::vec3(0, 0, 0);
+	
 }
 
 
-glm::mat4 EntityBase::getTMatrix() {
-	glm::mat4 trans = glm::translate(glm::mat4(1.0f), this->getPos());
-	glm::mat4 rot = glm::rotate(glm::mat4(1.0f), glm::radians(this->getRotation()), glm::vec4(0, 0, 1));
-	glm::mat4 scale = glm::scale(glm::mat4(1.0f), this->getScale());
-
-	//order: right to left
-	glm::mat4 t = trans * rot * scale;
-
-	return t;
-}
-
-glm::vec4 EntityBase::getPos() {
-	return this->pos;
-}
-
-void EntityBase::setPos(glm::vec4 pos) {
-	this->pos = pos;
-}
-
-glm::vec4 EntityBase::getVelocity() {
-	return this->velocity;
-}
-
-void EntityBase::setVelocity(glm::vec4 heading) {
-	this->velocity = heading;
-}

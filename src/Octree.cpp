@@ -19,7 +19,7 @@ void Octree::drawBox(const Box &box) {
 	glm::vec3 max = box.parameters[1];
 	glm::vec3 size = max - min;
 	glm::vec3 center = size / 2 + min;
-	ofVec3f p = ofVec3f(center.x, center.y, center.z);
+	glm::vec3 p = glm::vec3(center.x, center.y, center.z);
 	float w = size.x;
 	float h = size.y;
 	float d = size.z;
@@ -30,11 +30,11 @@ void Octree::drawBox(const Box &box) {
 //
 Box Octree::meshBounds(const ofMesh & mesh) {
 	int n = mesh.getNumVertices();
-	ofVec3f v = mesh.getVertex(0);
-	ofVec3f max = v;
-	ofVec3f min = v;
+	glm::vec3 v = mesh.getVertex(0);
+	glm::vec3 max = v;
+	glm::vec3 min = v;
 	for (int i = 1; i < n; i++) {
-		ofVec3f v = mesh.getVertex(i);
+		glm::vec3 v = mesh.getVertex(i);
 
 		if (v.x > max.x) max.x = v.x;
 		else if (v.x < min.x) min.x = v.x;
@@ -57,7 +57,7 @@ int Octree::getMeshPointsInBox(const ofMesh & mesh, const vector<int>& points,
 	Box & box, vector<int> & pointsRtn) {
 	int count = 0;
 	for (int i = 0; i < points.size(); i++) {
-		ofVec3f v = mesh.getVertex(points[i]);
+		glm::vec3 v = mesh.getVertex(points[i]);
 		if (box.inside(glm::vec3(v.x, v.y, v.z))) {
 			count++;
 			pointsRtn.push_back(points[i]);
@@ -74,7 +74,7 @@ int Octree::getMeshFacesInBox(const ofMesh & mesh, const vector<int>& faces,
 	int count = 0;
 	for (int i = 0; i < faces.size(); i++) {
 		ofMeshFace face = mesh.getFace(faces[i]);
-		ofVec3f v[3];
+		glm::vec3 v[3];
 		v[0] = face.getVertex(0);
 		v[1] = face.getVertex(1);
 		v[2] = face.getVertex(2);

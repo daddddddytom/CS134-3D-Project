@@ -40,6 +40,8 @@ public:
 	glm::vec3 center() {
 		return ((max() - min()) / 2 + min());
 	}
+
+	static Box meshBounds(const ofMesh &mesh);
 };
 
 #endif // _BOX_H_

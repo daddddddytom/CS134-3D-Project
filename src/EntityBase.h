@@ -1,37 +1,46 @@
-#include "ofMain.h"
+#pragma once
 
-class EntityBase {
+#include "ofMain.h"
+#include "ofxAssimpModelLoader.h"
+#include "Box.h"
+
+/*
+What ofxAssimpModelLoader has:
+- position, rotation, scale
+- wireframe drawing, face drawing, axis drawing
+
+What ofxAssimpModelLoader doesn't have:
+- velocity, angular velocity
+- force, torque
+- collision checks
+*/
+class EntityBase : public ofxAssimpModelLoader {
 protected:
-	glm::vec4 pos;
-	glm::vec4 velocity;
-	float rotation = 0.0f;
-	glm::vec4 scale;
+	Box hitbox;
+	
+	glm::vec3 forces;
+	glm::vec3 velocity;
+
+	glm::vec3 dTheta;
+	glm::vec3 torque;
+	
+	float damping = 0.99;
+	float mass = 1;
 
 public:
-	ObjectBase() {}
+	EntityBase(string fileName);
 
-	ObjectBase(glm::vec4 pos) {
-		this->pos = pos;
-	}
+	//copy ctor just in case
+	EntityBase(const EntityBase &original);
+	
+	// overridable collision check functions
+	virtual bool inside(const glm::vec3 &p) const;
+	virtual bool inside(const glm::vec3 *points, int size) const;
+	virtual bool intersect(const Ray &ray);
+	virtual bool overlap(const Box &box);
 
-	ObjectBase(glm::vec4 pos, float rotation, glm::vec4 scale) {
-		this->pos = pos;
-		this->rotation = rotation;
-		this->scale = scale;
-	}
-
-	glm::vec3 getPos();
-	void setPos(glm::vec4 pos);
-	glm::vec3 getVelocity();
-	void setVelocity(glm::vec4 heading);
-
-	float getRotation();
-	virtual void setRotation(float rotation);
-
-	glm::vec3 getScale();
-	void setScale(glm::vec4 scale);
-
-	// Return the transformation matrix of this given shape.
-	glm::mat4 getTMatrix();
+	// physics
+	void integrate();
+	
 
 };

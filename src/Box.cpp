@@ -59,3 +59,25 @@ bool Box::overlap(const Box& box) const {
 		(aMin.y <= bMax.y && aMax.y >= bMin.y) &&
 		(aMin.z <= bMax.z && aMax.z >= bMin.z);
 }
+
+Box Box::meshBounds(const ofMesh& mesh) {
+	int n = mesh.getNumVertices();
+	glm::vec3 v = mesh.getVertex(0);
+	glm::vec3 max = v;
+	glm::vec3 min = v;
+	for (int i = 1; i < n; i++) {
+		glm::vec3 v = mesh.getVertex(i);
+
+		if (v.x > max.x) max.x = v.x;
+		else if (v.x < min.x) min.x = v.x;
+
+		if (v.y > max.y) max.y = v.y;
+		else if (v.y < min.y) min.y = v.y;
+
+		if (v.z > max.z) max.z = v.z;
+		else if (v.z < min.z) min.z = v.z;
+	}
+	return Box(glm::vec3(min.x, min.y, min.z), glm::vec3(max.x, max.y, max.z));
+}
+
+
