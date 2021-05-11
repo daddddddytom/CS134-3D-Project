@@ -16,12 +16,12 @@ bool rayIntersectPlane(const glm::vec3 &rayPoint, const glm::vec3 &raydir, const
 	// if d1 is 0, then the ray is on the plane or there is no intersection
 	//
 	const float eps = .000000001;
-	float d1 = (planePoint - rayPoint).dot(planeNorm);
+	float d1 = glm::dot(planePoint - rayPoint, planeNorm);
 	if (abs(d1) < eps) return false;
 
 	//  if d2 is 0, then the ray is parallel to the plane
 	//
-	float d2 = raydir.dot(planeNorm);
+	float d2 = glm::dot(raydir,planeNorm);
 	if (abs(d2) < eps) return false;
 
 	//  compute the intersection point and return it in "point"
@@ -34,5 +34,5 @@ bool rayIntersectPlane(const glm::vec3 &rayPoint, const glm::vec3 &raydir, const
 // 
 //
 glm::vec3 reflectVector(const glm::vec3 &v, const glm::vec3 &n) {
-	return (v - 2 * v.dot(n) * n);
+	return (v - 2 * glm::dot(v, n) * n);
 }
