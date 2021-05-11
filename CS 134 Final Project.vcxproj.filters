@@ -309,4 +309,9 @@
   <ItemGroup>
     <ResourceCompile Include="icon.rc" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="Text.txt">
+      <Filter>src</Filter>
+    </Text>
+  </ItemGroup>
 </Project>
