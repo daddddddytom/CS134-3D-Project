@@ -2,7 +2,7 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:../src/EntityTerrain.h">
+      location = "group:/Volumes/T7/of_v0.11.2_osx_release/apps/myApps/CS134-3D-Project/src/EntityTerrain.h">
    </FileRef>
    <FileRef
       location = "self:">

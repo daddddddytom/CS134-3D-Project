@@ -101,6 +101,7 @@
 		B1C1F185264BCC700023E9F6 /* EntityLander.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EntityLander.h; sourceTree = "<group>"; };
 		B1C1F186264BCC8A0023E9F6 /* EntityLander.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = EntityLander.cpp; sourceTree = "<group>"; };
 		B1C1F187264BCCD10023E9F6 /* EntityTerrain.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = EntityTerrain.cpp; sourceTree = "<group>"; };
+		B1C1F18B264BCE8D0023E9F6 /* EntityTerrain.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EntityTerrain.h; sourceTree = "<group>"; };
 		B88CB7B6A955078287FF73DB /* material.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = material.h; path = ../../../../../../Users/tomererlich/Downloads/of_v0.11.2_osx_release/addons/ofxAssimpModelLoader/libs/assimp/include/assimp/material.h; sourceTree = SOURCE_ROOT; };
 		BA37089FD9AAC9BE63992A10 /* color4.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = color4.h; path = ../../../../../../Users/tomererlich/Downloads/of_v0.11.2_osx_release/addons/ofxAssimpModelLoader/libs/assimp/include/assimp/color4.h; sourceTree = SOURCE_ROOT; };
 		BBCAF5B3DFB8F215420C3400 /* types.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = types.h; path = ../../../../../../Users/tomererlich/Downloads/of_v0.11.2_osx_release/addons/ofxAssimpModelLoader/libs/assimp/include/assimp/types.h; sourceTree = SOURCE_ROOT; };
@@ -788,23 +789,24 @@
 		E4B69E1C0A3A1BDC003C02F2 /* src */ = {
 			isa = PBXGroup;
 			children = (
-				E4B69E1D0A3A1BDC003C02F2 /* main.cpp */,
-				E4B69E1E0A3A1BDC003C02F2 /* ofApp.cpp */,
-				E4B69E1F0A3A1BDC003C02F2 /* ofApp.h */,
 				F5E8BB6CF57A57E2207B39E6 /* Box.cpp */,
-				820B93664991383A0D51C365 /* Box.h */,
 				823C8A6F073E9D7D3581A25D /* EntityBase.cpp */,
+				B1C1F186264BCC8A0023E9F6 /* EntityLander.cpp */,
+				B1C1F187264BCCD10023E9F6 /* EntityTerrain.cpp */,
+				AE38A07682D2548F9B7E26C9 /* InputHandler.cpp */,
+				E4B69E1D0A3A1BDC003C02F2 /* main.cpp */,
+				D47AF61714087792E8D4731E /* Octree.cpp */,
+				E4B69E1E0A3A1BDC003C02F2 /* ofApp.cpp */,
+				3552B997BBE6876739E954F8 /* Util.cpp */,
+				820B93664991383A0D51C365 /* Box.h */,
 				E1C97C747D599A58A7DD00E4 /* EntityBase.h */,
 				B1C1F185264BCC700023E9F6 /* EntityLander.h */,
-				B1C1F187264BCCD10023E9F6 /* EntityTerrain.cpp */,
-				B1C1F186264BCC8A0023E9F6 /* EntityLander.cpp */,
-				AE38A07682D2548F9B7E26C9 /* InputHandler.cpp */,
+				B1C1F18B264BCE8D0023E9F6 /* EntityTerrain.h */,
 				E6585213A5580B8213961143 /* InputHandler.h */,
-				D47AF61714087792E8D4731E /* Octree.cpp */,
 				CA46A17B90CA1B4C654986A6 /* Octree.h */,
+				E4B69E1F0A3A1BDC003C02F2 /* ofApp.h */,
 				AA9602E75E1EB3DB804B328C /* PhysicsUtil.h */,
 				07DEBA6ECA69C44459E2AA76 /* Ray.h */,
-				3552B997BBE6876739E954F8 /* Util.cpp */,
 				8B1B0EF6734BAA54449ABA0E /* Util.h */,
 			);
 			path = src;
