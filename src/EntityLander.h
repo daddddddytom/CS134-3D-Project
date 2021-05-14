@@ -7,7 +7,7 @@
 
 #ifndef EntityLander_h
 #define EntityLander_h
-#include "EntityTerrain.h"
+#include "EntityBase.h"
 
 
 #endif /* EntityLander_h */

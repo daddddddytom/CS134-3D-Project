@@ -9,5 +9,5 @@
 #define EntityTerrain_hpp
 
 #include <stdio.h>
-
+#include "EntityBase.h"
 #endif /* EntityTerrain_hpp */

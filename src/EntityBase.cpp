@@ -13,8 +13,24 @@ EntityBase::EntityBase(const EntityBase& original) {
 	// minimum functionality as fail safe, but please avoid using this at all cost.
 	cout << "Warning: Copy ctor for EntityBase called. Consider using object reference instead." << endl;
 	this->hitbox = original.hitbox;
-	this->setPosition(original.pos.x, original.pos.y, original.pos.z);
+	//this->setPosition(original.pos.x, original.pos.y, original.pos.z);
 }
+
+
+EntityBase::EntityBase() {
+	glm::vec3 force = glm::vec3(0, 0, 0);
+	glm::vec3 velocity = glm::vec3(0, 0, 0);
+
+	glm::vec3 dTheta = glm::vec3(0, 0, 0);
+	glm::vec3 torque = glm::vec3(0, 0, 0);
+
+
+
+
+	float damping = 0.99;
+	float mass = 1;
+}
+
 
 bool EntityBase::inside(const glm::vec3& p) const {
 	return hitbox.inside(p);
@@ -34,13 +50,13 @@ bool EntityBase::overlap(const Box& box) {
 
 void EntityBase::integrate() {
 	// delta time
-	float dt = 1.0 / ofGetFrameRate();
+	float dt = 1.0 / 60;
 
 	// s(t) = vt
 	pos += velocity * dt;
 
 	// F = ma; a = F/m
-	ofVec3f accel = (forces / mass);
+	ofVec3f accel = (force / mass);
 
 	// v(t + dt) = v(t) + a(t) * dt 
 	velocity += accel * dt;
@@ -61,9 +77,11 @@ void EntityBase::integrate() {
 	dTheta *= damping;
 
 	// clear forces
-	forces = glm::vec3(0, 0, 0);
+	//force = glm::vec3(0, 0, 0);
 	torque = glm::vec3(0, 0, 0);
 	
 }
+
+
 
 
