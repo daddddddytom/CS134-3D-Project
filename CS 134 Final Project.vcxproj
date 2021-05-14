@@ -182,6 +182,8 @@
   <ItemGroup>
     <ClCompile Include="src\Box.cpp" />
     <ClCompile Include="src\EntityBase.cpp" />
+    <ClCompile Include="src\EntityLander.cpp" />
+    <ClCompile Include="src\Terrain.cpp" />
     <ClCompile Include="src\InputHandler.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Octree.cpp" />
@@ -200,11 +202,17 @@
     <ClCompile Include="..\..\..\addons\ofxGui\src\ofxSlider.cpp" />
     <ClCompile Include="..\..\..\addons\ofxGui\src\ofxSliderGroup.cpp" />
     <ClCompile Include="..\..\..\addons\ofxGui\src\ofxToggle.cpp" />
+    <ClCompile Include="src\Particle.cpp" />
+    <ClCompile Include="src\ParticleEmitter.cpp" />
+    <ClCompile Include="src\ParticleSystem.cpp" />
+    <ClCompile Include="src\TransformObject.cpp" />
     <ClCompile Include="src\Util.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Box.h" />
     <ClInclude Include="src\EntityBase.h" />
+    <ClInclude Include="src\EntityLander.h" />
+    <ClInclude Include="src\Terrain.h" />
     <ClInclude Include="src\InputHandler.h" />
     <ClInclude Include="src\Octree.h" />
     <ClInclude Include="src\ofApp.h" />
@@ -266,8 +274,12 @@
     <ClInclude Include="..\..\..\addons\ofxGui\src\ofxSlider.h" />
     <ClInclude Include="..\..\..\addons\ofxGui\src\ofxSliderGroup.h" />
     <ClInclude Include="..\..\..\addons\ofxGui\src\ofxToggle.h" />
+    <ClInclude Include="src\Particle.h" />
+    <ClInclude Include="src\ParticleEmitter.h" />
+    <ClInclude Include="src\ParticleSystem.h" />
     <ClInclude Include="src\PhysicsUtil.h" />
     <ClInclude Include="src\Ray.h" />
+    <ClInclude Include="src\TransformObject.h" />
     <ClInclude Include="src\Util.h" />
   </ItemGroup>
   <ItemGroup>

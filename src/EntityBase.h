@@ -23,9 +23,6 @@ public:
 
 	glm::vec3 dTheta = glm::vec3(0, 0, 0);
 	glm::vec3 torque = glm::vec3(0, 0, 0);
-	
-
-	
 
 	float damping = 0.99;
 	float mass = 1;
@@ -43,7 +40,7 @@ public:
 	virtual bool overlap(const Box &box);
 
 	// physics
-	void integrate();
+	virtual void integrate();
 	
 
 

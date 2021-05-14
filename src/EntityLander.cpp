@@ -2,8 +2,20 @@
 //  EntityLander.cpp
 //  CS134-3D-Project
 //
-//  Created by Tomer Erlich on 5/12/21.
-//
 
-#include <stdio.h>
 #include "EntityLander.h"
+
+void EntityLander::setRotation(int which, float angle, float rot_x, float rot_y, float r_z) {
+	EntityBase::setRotation(which, angle, rot_x, rot_y, r_z);
+
+	// rotate the 3 axis
+}
+
+void EntityLander::draw() {
+	// Draw the lander.
+	EntityBase::draw(OF_MESH_FILL);
+
+	// Draw the particles
+	this->mainThruster.draw();
+	
+}
