@@ -72,18 +72,18 @@ void ofApp::setup() {
 	gui.setup();
 	gui.add(numLevels.setup("Number of Octree Levels", 1, 1, 10));
 	
-	lander.loadModel("data/geo/landerTest1.obj");
+	lander.loadModel("geo/landerTest1.obj");
 	lander.setScaleNormalization(false);
 	bLanderLoaded = true;
 
-	terrain.loadModel("data/geo/moon-houdini.obj");
+	terrain.loadModel("geo/terrain2.obj");
 	terrain.setScaleNormalization(false);
 
 	//  Create Octree for testing.
 	//
 
 	ofResetElapsedTimeCounter();
-	octree.create(terrain.getMesh(0), 20);
+	octree.create(terrain.getMesh(0), 7);
 	float t = ofGetElapsedTimeMillis();
 	cout << "Build tree time in milliseconds:" << t << endl;
 	cout << "Number of Verts: " << terrain.getMesh(0).getNumVertices() << endl;
