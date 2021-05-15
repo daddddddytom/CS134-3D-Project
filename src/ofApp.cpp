@@ -40,12 +40,13 @@ void ofApp::setup() {
 	gravityForce = new GravityForce(ofVec3f(0, 10, 0));
 	engineForce = new ThrustForce(ofVec3f(0, -20, 0));
 
+	lander.setPosition(200,300,200);
 
 	//octree.create(terrain.getMesh(0), 20);
 
 
 	
-
+	pathBox = Box(glm::vec3(0,0,0), glm::vec3(200,300,200));
 
 	bWireframe = false;
 	bDisplayPoints = false;
@@ -76,7 +77,7 @@ void ofApp::setup() {
 	lander.setScaleNormalization(false);
 	bLanderLoaded = true;
 
-	terrain.loadModel("geo/terrain.obj");
+	terrain.loadModel("geo/terrain2.obj");
 	terrain.setScaleNormalization(false);
 
 	//  Create Octree for testing.
@@ -122,6 +123,12 @@ void ofApp::update() {
 	ofVec3f max = lander.getSceneMax() + lander.getPosition();
 	landerBox = Box(glm::vec3(min.x, min.y, min.z), glm::vec3(max.x, max.y, max.z));
 	//cout << landerBox.center()<<endl;
+
+	checkDistToPath();
+	if (bLanderOut) {
+		cout << "Mission failed: Lander too far way from path" << endl;
+	}
+
 	collisionDetection();
 	lander.integrate();
 	land();
@@ -148,7 +155,7 @@ void ofApp::draw() {
 	cam.begin();
 	engineEmitter.draw();
 	ofPushMatrix();
-	
+	drawPath(landerBox);
 	if (bWireframe) {                    // wireframe mode  (include axis)
 		ofDisableLighting();
 		ofSetColor(ofColor::slateGray);
@@ -268,6 +275,41 @@ void ofApp::drawAxis(ofVec3f location) {
 
 	ofPopMatrix();
 }
+
+void ofApp::checkDistToPath() {
+	glm::vec3 boxCenter = glm::vec3(pathBox.center().x, pathBox.center().y, pathBox.center().z);
+	glm::vec3 landerPos = glm::vec3(lander.getPosition().x, lander.getPosition().y, lander.getPosition().z);
+	float dist = glm::distance(boxCenter,landerPos);
+	//cout << dist << endl;
+	if (dist > 500) {
+		bLanderOut = true;
+	}
+	else {
+		bLanderOut = false;
+	}
+}
+
+
+
+
+void ofApp::drawPath(Box landerBox) {
+	ofPushMatrix();
+	
+	//ofSetColor(0x000000);
+	ofNoFill();
+
+	
+	ofDrawBezier(0,0,0,10,450,100,200,150,100, 200,300,200);
+
+	
+	//ofDrawLine(ofPoint(400, 600, 0), ofPoint(landerBox.center().x, landerBox.center().y, landerBox.center().z));
+
+
+
+
+	ofPopMatrix();
+}
+
 
 
 void ofApp::keyPressed(int key) {
@@ -542,7 +584,7 @@ void ofApp::collisionDetection(){
 	ofVec3f foot2 = ofVec3f(c.x - landerBox.width() / 2, c.y - landerBox.height() / 2, c.z + landerBox.width() / 2);
 	ofVec3f foot3 = ofVec3f(c.x + landerBox.width() / 2, c.y - landerBox.height() / 2, c.z - landerBox.width() / 2);
 	ofVec3f foot4 = ofVec3f(c.x - landerBox.width() / 2, c.y - landerBox.height() / 2, c.z - landerBox.width() / 2);
-	cout << landerBox.width() / 2 << endl;
+	//cout << landerBox.width() / 2 << endl;
 	TreeNode node;
 
 	octree.intersect(foot1, octree.root, node);

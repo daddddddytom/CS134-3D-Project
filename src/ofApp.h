@@ -69,7 +69,7 @@ public:
 	bool bDisplayBBoxes = false;
 	bool bDisplayOctree = false;
 	vector<Box> bboxList;
-
+	void checkDistToPath();
 	ofVec3f selectedPoint;
 	ofVec3f intersectPoint;
 
@@ -79,10 +79,10 @@ public:
 	const float selectionRange = 4.0;
 
 
-	
+	bool bLanderOut;
 	Box landerBox;
 	Box testBox;
-	
+	Box pathBox;
 	
 	Octree octree;
 	TreeNode selectedNode;
@@ -96,7 +96,7 @@ public:
 	ParticleEmitter engineEmitter;
 
 
-
+	void drawPath(Box landerBox);
 
 	TurbulenceForce* turbForce;
 	GravityForce* gravityForce;
