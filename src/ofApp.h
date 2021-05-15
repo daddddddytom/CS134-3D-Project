@@ -9,6 +9,8 @@
 #include "TransformObject.h"
 #include <glm/gtx/intersect.hpp>
 #include "EntityBase.h"
+#include "ofxGui.h"
+#include "Octree.h"
 
 class ofApp : public ofBaseApp {
 
@@ -35,36 +37,62 @@ public:
 	void togglePointsDisplay();
 	void toggleSelectTerrain();
 	void setCameraTarget();
-	glm::vec3 getMousePointOnPlane();
+	bool mouseIntersectPlane(glm::vec3 planePoint, glm::vec3 planeNorm, glm::vec3 &point);
+	glm::vec3 getMousePointOnPlane(glm::vec3 planePt, glm::vec3 planeNorm);
 	void drawBox(const Box &box);
 	Box meshBounds(const ofMesh &);
+	bool raySelectWithOctree(ofVec3f &pointRet);
 
+	void collisionDetection();
 
 	ofEasyCam cam;
 	ofCamera top;
 	ofCamera *theCam;
-	EntityBase terrain, lander;
+	EntityBase lander;
+	ofxAssimpModelLoader terrain;
 	ofLight light;
 	Box boundingBox;
 	Box landerBounds;
 
+
+	vector<Box> colBoxList;
+	bool pointSelected = false;
 	bool bAltKeyDown;
 	bool bCtrlKeyDown;
 	bool bWireframe;
 	bool bDisplayPoints;
 	bool bPointSelected;
-
+	bool bCollision = false;
 	bool bLanderLoaded = false;
 	bool bTerrainSelected;
 	bool bLanderSelected = false;
+	bool bDisplayBBoxes = false;
+	vector<Box> bboxList;
 
 	ofVec3f selectedPoint;
 	ofVec3f intersectPoint;
 
 	glm::vec3 mouseDownPos;
 
-
+	
 	const float selectionRange = 4.0;
+
+
+	
+	
+	Box testBox;
+	
+	
+	Octree octree;
+	TreeNode selectedNode;
+	glm::vec3  mouseLastPos;
+	bool bInDrag = false;
+	ofxIntSlider numLevels;
+	ofxPanel gui;
+	//const float selectionRange = 4.0;
+
+
+
 
 
 	TurbulenceForce* turbForce;

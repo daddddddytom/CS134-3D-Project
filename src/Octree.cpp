@@ -157,7 +157,7 @@ void Octree::create(const ofMesh & geo, int numLevels) {
 	level++;
 	subdivide(mesh, root, numLevels, level);
 
-	updateLeafNodes(numLevels);
+	//updateLeafNodes(numLevels);
 }
 
 
@@ -198,18 +198,25 @@ void Octree::subdivide(const ofMesh & mesh, TreeNode & node, int numLevels, int 
 //
 
 bool Octree::intersect(const Ray &ray, const TreeNode & node, TreeNode & nodeRtn) {
-	if (node.box.intersect(ray, 0, std::numeric_limits<float>::infinity())) {
-		// termination at level = 20
-		if (node.children.empty()) {
-			nodeRtn = node;
-			return true;
-		}
+	bool intersects = false;
+	if (node.box.intersect(ray, -99999999, 10000000)) {
+		if (node.children.size() == 0) {
 
-		for (const TreeNode& child : node.children) {
-			if (intersect(ray, child, nodeRtn)) {
-				return true;
+			nodeRtn = node;
+			intersects = true;
+		}
+		else {
+			for (int i = 0; i < node.children.size(); i++) {
+				if (intersect(ray, node.children[i], nodeRtn))
+					return true;
 			}
 		}
+
+	}
+
+
+
+	return intersects;
 	}
 	
 	/*
@@ -221,32 +228,60 @@ bool Octree::intersect(const Ray &ray, const TreeNode & node, TreeNode & nodeRtn
 		}
 	}
 	*/
-	return false;
 
+
+bool Octree::intersect(const ofVec3f &point, TreeNode & node, TreeNode & nodeRtn) {
+	glm::vec3 point1 = glm::vec3(point.x, point.y, point.z);
 	
-	
+	if (node.box.inside(point1)) {
+
+		if (node.children.size() == 0) {
+			nodeRtn = node;
+			return true;
+		}
+
+		for (int i = 0; i < node.children.size(); i++) {
+			intersect(point, node.children[i], nodeRtn);
+		}
+	}
+	else {
+		return false;
+	}
 }
 
 bool Octree::intersect(const Box &box, TreeNode & node, vector<Box> & boxListRtn) {
-	boxListRtn.clear();
-	
-	for (TreeNode* np : leaves) {
-		if (np->box.overlap(box)) {
-			boxListRtn.push_back(np->box);
-		}
-	}
+	bool intersects = false;
+	if (node.box.overlap(box)) {
 
-	return !boxListRtn.empty();
+		if (node.children.size() == 0) {
+			boxListRtn.push_back(node.box);
+			for (int i = 0; i < node.children.size(); i++) {
+				if (intersect(box, node.children[i], boxListRtn))
+					intersects = true;
+			}
+			intersects = true;
+		}
+		else {
+			for (int i = 0; i < node.children.size(); i++) {
+				if (intersect(box, node.children[i], boxListRtn))
+					intersects = true;
+			}
+		}
+
+	}
+	return intersects;
 }
 
+
+
+
+
 void Octree::draw(TreeNode & node, int numLevels, int level) {
-	if (level >= numLevels) {
-		// terminate once past selected level
-		return;
-	}
+	if (level >= numLevels) return;
 	drawBox(node.box);
-	for (TreeNode& child : node.children) {
-		draw(child, numLevels, level + 1);
+	level++;
+	for (int i = 0; i < node.children.size(); i++) {
+		draw(node.children[i], numLevels, level);
 	}
 }
 

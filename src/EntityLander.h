@@ -20,6 +20,11 @@ protected:
 	ParticleEmitter mainThruster;
 
 public:
+	EntityLander() {
+		glm::vec3 heading = glm::vec3(pos.x, pos.y+.1, pos.z);
+		glm::vec3 horizontalAxis = glm::vec3(pos.x+.1, pos.y, pos.z);
+		glm::vec3 normalAxis = glm::vec3(pos.x, pos.y, pos.z+.1);
+	}
 	glm::vec3 get_heading() const {
 		return heading;
 	}

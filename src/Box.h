@@ -41,6 +41,14 @@ public:
 		return ((max() - min()) / 2 + min());
 	}
 
+	float height() {
+		return (max() - min()).y;
+	}
+	float width() {
+		return (max() - min()).x;
+	}
+
+
 	static Box meshBounds(const ofMesh &mesh);
 };
 

@@ -26,6 +26,7 @@
 
 #include "ofApp.h"
 #include "Util.h"
+#include "Octree.h"
 //#include <glm / gtx / intersect.hpp>
 
 
@@ -38,6 +39,9 @@ void ofApp::setup() {
 
 	gravityForce = new GravityForce(ofVec3f(0, 10, 0));
 	thrustForce = new ThrustForce();
+
+
+	//octree.create(terrain.getMesh(0), 20);
 
 
 
@@ -58,23 +62,35 @@ void ofApp::setup() {
 	ofEnableSmoothing();
 	ofEnableDepthTest();
 
-	top.setPosition(0, 25, 0);
-	top.lookAt(glm::vec3(0, 0, 0));
-	top.setNearClip(.1);
-	top.setFov(65.5);   // approx equivalent to 28mm in 35mm format
-
-	theCam = &cam;
-
 	// setup rudimentary lighting 
 	//
 	initLightingAndMaterials();
 
-	lander.loadModel("geo/landerTest1.obj");
+
+	// create sliders for testing
+	//
+	gui.setup();
+	gui.add(numLevels.setup("Number of Octree Levels", 1, 1, 10));
+	
+	lander.loadModel("data/geo/landerTest1.obj");
 	lander.setScaleNormalization(false);
 	bLanderLoaded = true;
-	
-	terrain.loadModel("geo/moon-houdini.obj");
+
+	terrain.loadModel("data/geo/moon-houdini.obj");
 	terrain.setScaleNormalization(false);
+
+	//  Create Octree for testing.
+	//
+
+	ofResetElapsedTimeCounter();
+	octree.create(terrain.getMesh(0), 20);
+	float t = ofGetElapsedTimeMillis();
+	cout << "Build tree time in milliseconds:" << t << endl;
+	cout << "Number of Verts: " << terrain.getMesh(0).getNumVertices() << endl;
+
+	
+
+	
 
 	boundingBox = meshBounds(terrain.getMesh(0));
 }
@@ -91,9 +107,10 @@ void ofApp::draw() {
 
 	ofBackground(ofColor::black);
 
-
-	theCam->begin();
-
+	glDepthMask(false);
+	glDepthMask(true);
+	ofSetColor(255, 255, 255);
+	cam.begin();
 	ofPushMatrix();
 	if (bWireframe) {                    // wireframe mode  (include axis)
 		ofDisableLighting();
@@ -108,22 +125,43 @@ void ofApp::draw() {
 	else {
 		ofEnableLighting();              // shaded mode
 		terrain.drawFaces();
-
+		ofMesh mesh;
 		if (bLanderLoaded) {
 			lander.drawFaces();
 			if (!bTerrainSelected) drawAxis(lander.getPosition());
+			if (bDisplayBBoxes) {
+				ofNoFill();
+				ofSetColor(ofColor::white);
+				for (int i = 0; i < lander.getNumMeshes(); i++) {
+					ofPushMatrix();
+					ofMultMatrix(lander.getModelMatrix());
+					ofRotate(-90, 1, 0, 0);
+					Octree::drawBox(bboxList[i]);
+					ofPopMatrix();
+				}
+			}
 
-			ofVec3f min = lander.getSceneMin() + lander.getPosition();
-			ofVec3f max = lander.getSceneMax() + lander.getPosition();
+			if (bLanderSelected) {
 
-			Box bounds = Box(glm::vec3(min.x, min.y, min.z), glm::vec3(max.x, max.y, max.z));
+				ofVec3f min = lander.getSceneMin() + lander.getPosition();
+				ofVec3f max = lander.getSceneMax() + lander.getPosition();
 
-			landerBounds = bounds;
+				Box bounds = Box(glm::vec3(min.x, min.y, min.z), glm::vec3(max.x, max.y, max.z));
+				ofNoFill();
+				//ofSetColor(ofColor::white);
+				Octree::drawBox(bounds);
 
-			drawBox(bounds);
+				// draw colliding boxes
+				//
+				ofSetColor(ofColor::red);
+				for (int i = 0; i < colBoxList.size(); i++) {
+					Octree::drawBox(colBoxList[i]);
+				}
+			}
 		}
-		if (bTerrainSelected) drawAxis(ofVec3f(0, 0, 0));
 	}
+	if (bTerrainSelected) drawAxis(ofVec3f(0, 0, 0));
+
 
 
 	if (bDisplayPoints) {                // display points as an option    
@@ -139,16 +177,25 @@ void ofApp::draw() {
 		ofDrawSphere(selectedPoint, .1);
 	}
 
-	ofNoFill();
-	ofSetColor(ofColor::white);
-	drawBox(boundingBox);
 
-	theCam->end();
+	// recursively draw octree
+	//
+	ofDisableLighting();
+	int level = 0;
+	//	ofNoFill();
 
 
-	if (bLanderSelected) {
-		ofSetColor(ofColor::red);
+	// if point selected, draw a sphere
+	//
+	if (pointSelected) {
+		ofVec3f p = octree.mesh.getVertex(selectedNode.points[0]);
+		ofVec3f d = p - cam.getPosition();
+		ofSetColor(ofColor::lightGreen);
+		ofDrawSphere(p, .02 * d.length());
 	}
+
+	ofPopMatrix();
+	cam.end();
 }
 
 // 
@@ -180,7 +227,7 @@ void ofApp::drawAxis(ofVec3f location) {
 
 
 void ofApp::keyPressed(int key) {
-	glm::vec3 m = getMousePointOnPlane();
+	
 	switch (key) {
 	case 'C':
 	case 'c':
@@ -315,16 +362,44 @@ void ofApp::mousePressed(int x, int y, int button) {
 	//
 	if (cam.getMouseInputEnabled()) return;
 
-	//  implement you code here to select the rover
-	//  if Selected, draw box in a different color
-	glm::vec3 o = theCam->getPosition();
-	glm::vec3 m = getMousePointOnPlane() - o;
-	glm::vec3 origion = glm::vec3(o.x, o.y, o.z);
-	glm::vec3 mouseD = glm::vec3(m.x, m.y, m.z);
-	Ray mouseRay = Ray(origion, mouseD);
-	if (landerBounds.intersect(mouseRay, -99999999, 10000000)) {
-		bLanderSelected = true;
+	// if moving camera, don't allow mouse interaction
+//
+	if (cam.getMouseInputEnabled()) return;
+
+	// if rover is loaded, test for selection
+	//
+	if (bLanderLoaded) {
+		glm::vec3 origin = cam.getPosition();
+		glm::vec3 mouseWorld = cam.screenToWorld(glm::vec3(mouseX, mouseY, 0));
+		glm::vec3 mouseDir = glm::normalize(mouseWorld - origin);
+
+		ofVec3f min = lander.getSceneMin() + lander.getPosition();
+		ofVec3f max = lander.getSceneMax() + lander.getPosition();
+
+		Box bounds = Box(glm::vec3(min.x, min.y, min.z), glm::vec3(max.x, max.y, max.z));
+		bool hit = bounds.intersect(Ray(glm::vec3(origin.x, origin.y, origin.z), glm::vec3(mouseDir.x, mouseDir.y, mouseDir.z)), 0, 10000);
+		if (hit) {
+			bLanderSelected = true;
+			mouseDownPos = getMousePointOnPlane(lander.getPosition(), cam.getZAxis());
+			mouseLastPos = mouseDownPos;
+			bInDrag = true;
+		}
+		else {
+			bLanderSelected = false;
+		}
 	}
+	else {
+		ofVec3f p;
+		ofResetElapsedTimeCounter();
+
+		raySelectWithOctree(p);
+		float t = ofGetElapsedTimeMicros();
+		cout << "Time for ray intersection in microsecond: " << t << endl;
+	}
+
+
+
+
 }
 
 
@@ -373,10 +448,7 @@ void ofApp::mouseDragged(int x, int y, int button) {
 	// 
 	//  implement your code here to drag the lander around
 	//lander.setPosition(0, 0, 0);
-	if (bLanderSelected) {
-		glm::vec3 m = getMousePointOnPlane();
-		lander.setPosition(m.x, m.y, m.z);
-	}
+	
 }
 
 //--------------------------------------------------------------
@@ -412,6 +484,70 @@ void ofApp::windowResized(int w, int h) {
 void ofApp::gotMessage(ofMessage msg) {
 
 }
+
+
+//Collision Detection
+void ofApp::collisionDetection(){
+	glm::vec3 c = landerBounds.center();
+	ofVec3f foot1 = ofVec3f(c.x + landerBounds.width() / 2, c.y - landerBounds.height() / 2, c.z + landerBounds.width()/2);
+	ofVec3f foot2 = ofVec3f(c.x - landerBounds.width() / 2, c.y - landerBounds.height() / 2, c.z - landerBounds.width()/2);
+	ofVec3f foot3 = ofVec3f(c.x - landerBounds.width()/2, c.y - landerBounds.height() / 2, c.z + landerBounds.width() / 2);
+	ofVec3f foot4 = ofVec3f(c.x + landerBounds.width() / 2, c.y - landerBounds.height() / 2, c.z - landerBounds.width() / 2);
+
+	TreeNode node;
+
+	octree.intersect(foot1, octree.root, node);
+	if (node.points.size() > 0) {
+		bCollision = true;
+
+		
+	}
+
+	octree.intersect(foot2, octree.root, node);
+	if (node.points.size() > 0) {
+		bCollision = true;
+
+
+	}
+
+	octree.intersect(foot3, octree.root, node);
+	if (node.points.size() > 0) {
+		bCollision = true;
+
+
+	}
+
+	octree.intersect(foot4, octree.root, node);
+	if (node.points.size() > 0) {
+		bCollision = true;
+
+
+	}
+
+
+	
+
+
+}
+
+
+bool ofApp::raySelectWithOctree(ofVec3f &pointRet) {
+	ofVec3f mouse(mouseX, mouseY);
+	ofVec3f rayPoint = cam.screenToWorld(mouse);
+	ofVec3f rayDir = rayPoint - cam.getPosition();
+	rayDir.normalize();
+	Ray ray = Ray(glm::vec3(rayPoint.x, rayPoint.y, rayPoint.z),
+		glm::vec3(rayDir.x, rayDir.y, rayDir.z));
+
+	pointSelected = octree.intersect(ray, octree.root, selectedNode);
+
+	if (pointSelected) {
+		pointRet = octree.mesh.getVertex(selectedNode.points[0]);
+	}
+	return pointSelected;
+}
+
+
 
 
 
@@ -518,16 +654,16 @@ void ofApp::dragEvent(ofDragInfo dragInfo) {
 //  intersect the mouse ray with the plane normal to the camera 
 //  return intersection point.   (package code above into function)
 //
-glm::vec3 ofApp::getMousePointOnPlane() {
+glm::vec3 ofApp::getMousePointOnPlane(glm::vec3 planePt, glm::vec3 planeNorm) {
 	// Setup our rays
 	//
-	glm::vec3 origin = theCam->getPosition();
-	glm::vec3 camAxis = theCam->getZAxis();
-	glm::vec3 mouseWorld = theCam->screenToWorld(glm::vec3(mouseX, mouseY, 0));
+	glm::vec3 origin = cam.getPosition();
+	glm::vec3 camAxis = cam.getZAxis();
+	glm::vec3 mouseWorld = cam.screenToWorld(glm::vec3(mouseX, mouseY, 0));
 	glm::vec3 mouseDir = glm::normalize(mouseWorld - origin);
 	float distance;
 
-	bool hit = glm::intersectRayPlane(origin, mouseDir, glm::vec3(0, 0, 0), camAxis, distance);
+	bool hit = glm::intersectRayPlane(origin, mouseDir, planePt, planeNorm, distance);
 
 	if (hit) {
 		// find the point of intersection on the plane using the distance 
@@ -540,4 +676,14 @@ glm::vec3 ofApp::getMousePointOnPlane() {
 		return intersectPoint;
 	}
 	else return glm::vec3(0, 0, 0);
+}
+
+
+
+bool ofApp::mouseIntersectPlane(glm::vec3 planePoint, glm::vec3 planeNorm, glm::vec3 &point) {
+	ofVec2f mouse(mouseX, mouseY);
+	ofVec3f rayPoint = cam.screenToWorld(glm::vec3(mouseX, mouseY, 0));
+	ofVec3f rayDir = rayPoint - cam.getPosition();
+	rayDir.normalize();
+	return (rayIntersectPlane(rayPoint, rayDir, planePoint, planeNorm, point));
 }

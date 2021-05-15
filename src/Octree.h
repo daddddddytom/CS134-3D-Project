@@ -24,11 +24,11 @@ public:
 
 class Octree {
 public:
-	Octree();
+	//Octree();
 	void create(const ofMesh & mesh, int numLevels);
 	void subdivide(const ofMesh & mesh, TreeNode & node, int numLevels, int level);
 	bool intersect(const Ray &, const TreeNode & node, TreeNode & nodeRtn);
-	bool intersect(const Box &, TreeNode & node, vector<Box> & boxListRtn);
+	bool intersect(const ofVec3f &point, TreeNode & node, TreeNode & nodeRtn);
 	void draw(TreeNode & node, int numLevels, int level);
 	void draw(int numLevels, int level) {
 		draw(root, numLevels, level);
@@ -47,6 +47,9 @@ public:
 	TreeNode root;
 	vector<TreeNode*> leaves;
 	bool bUseFaces = false;
+
+
+	bool intersect(const Box &box, TreeNode & node, vector<Box> & boxListRtn);
 
 	// debug;
 	//
