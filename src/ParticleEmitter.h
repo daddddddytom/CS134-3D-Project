@@ -44,5 +44,5 @@ public:
 	bool createdSys;
 	EmitterType type;
 	ofColor color;
-	void ParticleEmitter::setColor(const ofColor &color);
+	void setColor(const ofColor &color);
 };
