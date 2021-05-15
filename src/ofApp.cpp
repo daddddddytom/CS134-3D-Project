@@ -38,13 +38,13 @@ void ofApp::setup() {
 
 
 	gravityForce = new GravityForce(ofVec3f(0, 10, 0));
-	thrustForce = new ThrustForce();
+	engineForce = new ThrustForce(ofVec3f(0, -20, 0));
 
 
 	//octree.create(terrain.getMesh(0), 20);
 
 
-
+	
 
 
 	bWireframe = false;
@@ -76,14 +76,14 @@ void ofApp::setup() {
 	lander.setScaleNormalization(false);
 	bLanderLoaded = true;
 
-	terrain.loadModel("geo/terrain2.obj");
+	terrain.loadModel("geo/terrain.obj");
 	terrain.setScaleNormalization(false);
 
 	//  Create Octree for testing.
 	//
 
 	ofResetElapsedTimeCounter();
-	octree.create(terrain.getMesh(0), 7);
+	octree.create(terrain.getMesh(0), 10);
 	float t = ofGetElapsedTimeMillis();
 	cout << "Build tree time in milliseconds:" << t << endl;
 	cout << "Number of Verts: " << terrain.getMesh(0).getNumVertices() << endl;
@@ -93,25 +93,62 @@ void ofApp::setup() {
 	
 
 	boundingBox = meshBounds(terrain.getMesh(0));
+
+
+
+	engineEmitter.sys->addForce(engineForce);
+	engineEmitter.setEmitterType(DiscEmitter);
+	engineEmitter.setPosition(lander.getPosition());
+	engineEmitter.setLifespan(1);
+	engineEmitter.setGroupSize(20);
+	engineEmitter.setParticleRadius(.02);
+	engineEmitter.radius = .5;
+	engineEmitter.setVelocity(ofVec3f(0, 0, 0));
+	engineEmitter.start();
+
+
+
+
+
+
+
 }
 
 //--------------------------------------------------------------
 // incrementally update scene (animation)
 //
 void ofApp::update() {
-	
+	ofVec3f min = lander.getSceneMin() + lander.getPosition();
+	ofVec3f max = lander.getSceneMax() + lander.getPosition();
+	landerBox = Box(glm::vec3(min.x, min.y, min.z), glm::vec3(max.x, max.y, max.z));
+	//cout << landerBox.center()<<endl;
+	collisionDetection();
 	lander.integrate();
+	land();
+	if (startEngine) {
+		engineEmitter.setRate(20);
+	}
+	else {
+		engineEmitter.setRate(0);
+	}
+	engineEmitter.update();
+	engineEmitter.setPosition(lander.getPosition() + ofVec3f(0, 1, 0));
+
+	
 }
 //--------------------------------------------------------------
 void ofApp::draw() {
 
 	ofBackground(ofColor::black);
-
+	
 	glDepthMask(false);
+	gui.draw();
 	glDepthMask(true);
 	ofSetColor(255, 255, 255);
 	cam.begin();
+	engineEmitter.draw();
 	ofPushMatrix();
+	
 	if (bWireframe) {                    // wireframe mode  (include axis)
 		ofDisableLighting();
 		ofSetColor(ofColor::slateGray);
@@ -169,6 +206,13 @@ void ofApp::draw() {
 		ofSetColor(ofColor::green);
 		terrain.drawVertices();
 	}
+
+	if (bDisplayOctree) {
+		ofNoFill();
+		ofSetColor(ofColor::white);
+		octree.draw(numLevels, 0);
+	}
+
 
 	// highlight selected point (draw sphere around selected point)
 	//
@@ -247,6 +291,10 @@ void ofApp::keyPressed(int key) {
 	case 's':
 		savePicture();
 		break;
+	case 'O':
+	case 'o':
+		bDisplayOctree = !bDisplayOctree;
+		break;
 	case 't':
 		setCameraTarget();
 		break;
@@ -278,24 +326,24 @@ void ofApp::keyPressed(int key) {
 		theCam = &top;
 		break;
 	case OF_KEY_UP:
-		cout << lander.getPosition() << endl;
-		lander.force += ofVec3f(0, 1, 0);
 		
+		lander.force += ofVec3f(0, 1, 0);
+		startEngine = true;
 		break;
 	case OF_KEY_DOWN:
-		cout << lander.getPosition() << endl;
+		
 		lander.force += ofVec3f(0, -1, 0);
 
 		break;
 	case OF_KEY_LEFT:
 		
 	//	ofVec3f
-		lander.force += ofVec3f(-1,0,0);
+		lander.force += ofVec3f(0,0,-1);
 		break;
 
 	case OF_KEY_RIGHT:
-		cout << lander.getPosition() << endl;
-		lander.force += ofVec3f(1, 0, 0);
+		
+		lander.force += ofVec3f(0, 0, 1);
 		break;
 	default:
 		break;
@@ -329,6 +377,7 @@ void ofApp::keyReleased(int key) {
 		break;
 	case OF_KEY_UP:
 		lander.force = ofVec3f(0, 0, 0);
+		startEngine = false;
 		break;
 	case OF_KEY_DOWN:
 		lander.force = ofVec3f(0, 0, 0);
@@ -488,12 +537,12 @@ void ofApp::gotMessage(ofMessage msg) {
 
 //Collision Detection
 void ofApp::collisionDetection(){
-	glm::vec3 c = landerBounds.center();
-	ofVec3f foot1 = ofVec3f(c.x + landerBounds.width() / 2, c.y - landerBounds.height() / 2, c.z + landerBounds.width()/2);
-	ofVec3f foot2 = ofVec3f(c.x - landerBounds.width() / 2, c.y - landerBounds.height() / 2, c.z - landerBounds.width()/2);
-	ofVec3f foot3 = ofVec3f(c.x - landerBounds.width()/2, c.y - landerBounds.height() / 2, c.z + landerBounds.width() / 2);
-	ofVec3f foot4 = ofVec3f(c.x + landerBounds.width() / 2, c.y - landerBounds.height() / 2, c.z - landerBounds.width() / 2);
-
+	glm::vec3 c = landerBox.center();
+	ofVec3f foot1 = ofVec3f(c.x + landerBox.width() / 2, c.y - landerBox.height() / 2, c.z + landerBox.width() / 2);
+	ofVec3f foot2 = ofVec3f(c.x - landerBox.width() / 2, c.y - landerBox.height() / 2, c.z + landerBox.width() / 2);
+	ofVec3f foot3 = ofVec3f(c.x + landerBox.width() / 2, c.y - landerBox.height() / 2, c.z - landerBox.width() / 2);
+	ofVec3f foot4 = ofVec3f(c.x - landerBox.width() / 2, c.y - landerBox.height() / 2, c.z - landerBox.width() / 2);
+	cout << landerBox.width() / 2 << endl;
 	TreeNode node;
 
 	octree.intersect(foot1, octree.root, node);
@@ -529,6 +578,17 @@ void ofApp::collisionDetection(){
 
 
 }
+void ofApp::land()
+{
+
+	
+	if (bCollision) {
+		cout << "collison detected" << endl;
+		bCollision = false;
+	}
+	
+}
+
 
 
 bool ofApp::raySelectWithOctree(ofVec3f &pointRet) {

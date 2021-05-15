@@ -67,6 +67,7 @@ public:
 	bool bTerrainSelected;
 	bool bLanderSelected = false;
 	bool bDisplayBBoxes = false;
+	bool bDisplayOctree = false;
 	vector<Box> bboxList;
 
 	ofVec3f selectedPoint;
@@ -74,12 +75,12 @@ public:
 
 	glm::vec3 mouseDownPos;
 
-	
+	void land();
 	const float selectionRange = 4.0;
 
 
 	
-	
+	Box landerBox;
 	Box testBox;
 	
 	
@@ -87,17 +88,19 @@ public:
 	TreeNode selectedNode;
 	glm::vec3  mouseLastPos;
 	bool bInDrag = false;
+	bool startEngine = false;
 	ofxIntSlider numLevels;
 	ofxPanel gui;
 	//const float selectionRange = 4.0;
 
+	ParticleEmitter engineEmitter;
 
 
 
 
 	TurbulenceForce* turbForce;
 	GravityForce* gravityForce;
-	ThrustForce* thrustForce;
+	ThrustForce* engineForce;
 
 
 

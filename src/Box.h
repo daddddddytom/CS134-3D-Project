@@ -1,6 +1,8 @@
 #pragma once
+#ifndef _BOX_H_
+#define _BOX_H_
 
-#include "Ray.h"
+#include "ray.h"
 #include "ofMain.h"
 
 /*
@@ -50,3 +52,4 @@ public:
 	static Box meshBounds(const ofMesh &mesh);
 };
 
+#endif // _BOX_H_

@@ -1,4 +1,4 @@
-#include "Box.h"
+#include "box.h"
 
 /*
  * Ray-box intersection using IEEE numerical properties to ensure that the

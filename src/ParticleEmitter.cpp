@@ -131,6 +131,11 @@ void ParticleEmitter::spawn(float time) {
 		particle.velocity = velocity;
 		particle.position.set(position);
 		break;
+	case DiscEmitter:
+		ofVec3f dir = ofVec3f(ofRandom(-1, 1), ofRandom(-0.1, 0.1), ofRandom(-1, 1)).getNormalized()*radius;
+		particle.position.set(position + dir);
+		break;
+	
 	}
 
 	// other particle attributes
