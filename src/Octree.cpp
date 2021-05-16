@@ -157,7 +157,7 @@ void Octree::create(const ofMesh & geo, int numLevels) {
 	level++;
 	subdivide(mesh, root, numLevels, level);
 
-	//updateLeafNodes(numLevels);
+	updateLeafNodes(numLevels);
 }
 
 
@@ -250,6 +250,7 @@ bool Octree::intersect(const ofVec3f &point, TreeNode & node, TreeNode & nodeRtn
 }
 
 bool Octree::intersect(const Box &box, TreeNode & node, vector<Box> & boxListRtn) {
+	/*
 	bool intersects = false;
 	if (node.box.overlap(box)) {
 
@@ -270,6 +271,16 @@ bool Octree::intersect(const Box &box, TreeNode & node, vector<Box> & boxListRtn
 
 	}
 	return intersects;
+	*/
+	boxListRtn.clear();
+
+	for (TreeNode* np : leaves) {
+		if (np->box.overlap(box)) {
+			boxListRtn.push_back(np->box);
+		}
+	}
+
+	return !boxListRtn.empty();
 }
 
 
