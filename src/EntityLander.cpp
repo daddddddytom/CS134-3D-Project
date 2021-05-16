@@ -8,7 +8,7 @@
 EntityLander::EntityLander(string fileName) {
 	this->loadModel(fileName);
 	this->setScaleNormalization(false);
-	
+
 	mainThruster.sys->addForce(&thrustforce);
 	mainThruster.setEmitterType(DiscEmitter);
 	mainThruster.setPosition(this->getPosition());
@@ -24,8 +24,7 @@ void EntityLander::update() {
 	if (thrusterOn) {
 		mainThruster.setRate(10);
 		this->force += head() * 10;
-	} 
-	else {
+	} else {
 		mainThruster.setRate(0);
 	}
 	if (XRthrusterOn) {
@@ -35,7 +34,7 @@ void EntityLander::update() {
 		this->force -= right() * 10;
 	}
 	if (ZRthrusterOn) {
-		
+
 		this->force += back() * 10;
 	}
 	if (ZLthrusterOn) {
@@ -44,33 +43,28 @@ void EntityLander::update() {
 	}
 	if (rotateZACW) {
 		torqueZ += 100;
-	}
-	else if (rotateZCW) {
+	} else if (rotateZCW) {
 		torqueZ -= 100;
-	}
-	else if (!rotateZCW && !rotateZACW){
+	} else if (!rotateZCW && !rotateZACW) {
 		torqueZ = 0.0f;
 	}
 	if (rotateXACW) {
 		torqueX += 100;
-	}
-	else if (rotateXCW) {
+	} else if (rotateXCW) {
 		torqueX -= 100;
-	}
-	else if (!rotateXCW && !rotateXACW) {
+	} else if (!rotateXCW && !rotateXACW) {
 		torqueX = 0.0f;
 	}
 
 	if (rotateYACW) {
 		torqueY += 100;
-	}
-	else if (rotateYCW) {
+	} else if (rotateYCW) {
 		torqueY -= 100;
-	}
-	else if (!rotateYCW && !rotateYACW) {
+	} else if (!rotateYCW && !rotateYACW) {
 		torqueY = 0.0f;
 	}
 
+	/*
 	if (rotationX >= 20) {
 		rotationX = 20;
 	}
@@ -83,7 +77,7 @@ void EntityLander::update() {
 	if (rotationZ <= -20) {
 		rotationZ = -20;
 	}
-
+	*/
 	mainThruster.update();
 	mainThruster.setPosition(this->getPosition());
 

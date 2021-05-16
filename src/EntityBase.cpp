@@ -75,7 +75,9 @@ void EntityBase::integrate() {
 	this->setRotation(1, rotationY , 0, 1, 0);
 	this->setRotation(2, rotationZ , 0, 0, 1);
 	
-	
+	angularAccelerationZ = torqueZ / mass;
+	angularAccelerationX = torqueX / mass;
+	angularAccelerationY = torqueY / mass;
 	angularVelocityZ += angularAccelerationZ * dt;
 	angularVelocityZ *= damping;
 	angularVelocityX += angularAccelerationX * dt;
@@ -85,9 +87,6 @@ void EntityBase::integrate() {
 	rotationZ += (angularVelocityZ * dt);
 	rotationX += (angularVelocityX * dt);
 	rotationY += (angularVelocityY * dt);
-	angularAccelerationZ = torqueZ / mass; 
-	angularAccelerationX = torqueX / mass;
-	angularAccelerationY = torqueY / mass;
 
 
 	// damping
@@ -97,7 +96,9 @@ void EntityBase::integrate() {
 	// clear forces
 	force = glm::vec3(0, 0, 0);
 	torque = glm::vec3(0, 0, 0);
-	
+	torqueZ = 0;
+	torqueX = 0;
+	torqueY = 0;
 }
 
 void EntityBase::addForce(glm::vec3 quantity) {

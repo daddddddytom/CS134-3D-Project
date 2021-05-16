@@ -280,7 +280,7 @@ void ofApp::drawPath(Box landerBox) {
 
 
 void ofApp::keyPressed(int key) {
-	cout << ofGetKeyPressed() << endl;
+	//cout << ofGetKeyPressed() << endl;
 	switch (key) {
 	case 'C':
 	case 'c':
