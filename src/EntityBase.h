@@ -24,11 +24,28 @@ protected:
 	glm::vec3 dTheta = glm::vec3(0, 0, 0);
 	glm::vec3 torque = glm::vec3(0, 0, 0);
 
-	float damping = 0.99;
-	float mass = 1;
+	
+	
 
 public:
 	EntityBase(string fileName);
+
+
+	float damping = 0.99;
+	float mass = 1;
+	float rotationZ = 0.0;
+	float rotationX = 0.0;
+	float rotationY = 0.0;
+	float angularVelocityZ = 0.0;
+	float angularAccelerationZ = 0.0;
+	float angularVelocityX = 0.0;
+	float angularAccelerationX = 0.0;
+	float angularVelocityY = 0.0;
+	float angularAccelerationY = 0.0;
+	float torqueZ = 0.0;
+	float torqueY = 0.0;
+	float torqueX = 0.0;
+	
 
 	//copy ctor just in case
 	EntityBase(const EntityBase &original);

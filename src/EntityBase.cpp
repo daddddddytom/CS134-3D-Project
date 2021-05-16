@@ -29,6 +29,7 @@ EntityBase::EntityBase() {
 
 	float damping = 0.99;
 	float mass = 1;
+	
 }
 
 
@@ -63,14 +64,34 @@ void EntityBase::integrate() {
 
 	// angular accel = torque / I (completely arbitrary)
 	glm::vec3 angularAccel = torque / mass;
+	
 
 	// update dTheta
 	dTheta += angularAccel;
 
 	// angular velocity = change in theta / change in time
-	this->setRotation(0, this->getRotationAngle(0) + dTheta.x, 1, 0, 0);
-	this->setRotation(1, this->getRotationAngle(1) + dTheta.y, 0, 1, 0);
-	this->setRotation(2, this->getRotationAngle(2) + dTheta.z, 0, 0, 1);
+	this->setRotation(0, rotationX , 1, 0, 0);
+	this->setRotation(0, rotationY , 0, 1, 0);
+	this->setRotation(0, rotationZ , 0, 0, 1);
+
+	
+	
+	
+	angularVelocityZ += angularAccelerationZ * dt;
+	angularVelocityZ *= damping;
+	angularVelocityX += angularAccelerationZ * dt;
+	angularVelocityX *= damping;
+	angularVelocityY += angularAccelerationZ * dt;
+	angularVelocityY *= damping;
+	rotationZ += (angularVelocityZ * dt);
+	rotationX += (angularVelocityX * dt);
+	rotationY += (angularVelocityY * dt);
+	angularAccelerationZ = torqueZ / mass; 
+	angularAccelerationX = torqueX / mass;
+	angularAccelerationY = torqueY / mass;
+	
+
+
 
 	// damping
 	velocity *= damping;

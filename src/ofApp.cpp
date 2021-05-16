@@ -60,18 +60,40 @@ void ofApp::update() {
 	}
 
 	if (inputHandler.getInputState(InputHandler::A)) {
-		lander.addTorque(glm::vec3(0, 0, 0.1));
+		//lander.addTorque(glm::vec3(0, 0, -0.1));
+		lander.rotateZACW = true;
+		cout << lander.torqueZ << endl;
+	}
+	else if(inputHandler.getInputState(InputHandler::A) == false) {
+
+		lander.rotateZACW = false;
+		//cout << lander.rotateHeading << endl;
 	}
 	if (inputHandler.getInputState(InputHandler::D)) {
-		lander.addTorque(glm::vec3(0, 0, -0.1));
+		//lander.addTorque(glm::vec3(0, 0, -0.1));
+		lander.rotateZCW = true;
 	}
+	else {
+
+		lander.rotateZCW = false;
+		//cout << lander.rotateHeading << endl;
+	}
+	
 
 	if (inputHandler.getInputState(InputHandler::W)) {
-		lander.addTorque(glm::vec3(0.1, 0, 0));
+		//lander.addTorque(glm::vec3(0.1, 0, 0));
+		lander.rotateXACW = true;
+	}
+	else {
+		lander.rotateXACW = false;
 	}
 
 	if (inputHandler.getInputState(InputHandler::S)) {
-		lander.addTorque(glm::vec3(0, 0, -0.1));
+		//lander.addTorque(glm::vec3(-0.1, 0, 0));
+		lander.rotateXCW = true;
+	}
+	else {
+		lander.rotateXCW = false;
 	}
 
 	collisionDetection();
@@ -336,10 +358,12 @@ void ofApp::keyReleased(int key) {
 		break;
 	case ' ':
 		inputHandler.setInputState(InputHandler::SPACE, false);
+		
 		break;
 	case 'a':
 	case 'A':
 		inputHandler.setInputState(InputHandler::A, false);
+		
 		break;
 	case 's':
 	case 'S':
