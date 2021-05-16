@@ -13,9 +13,16 @@
 
 class Terrain : public ofxAssimpModelLoader {
 protected:
-	Octree octree;
+	
 
 public:
+	Octree octree;
+	Terrain(string filename, int hitboxLevel) {
+		loadModel(filename);
+		setScaleNormalization(false);
+		octree.create(this->getMesh(0), hitboxLevel);
+	}
+	
 	bool intersect(const Ray &ray);
 	bool overlap(const Box &box);
 };

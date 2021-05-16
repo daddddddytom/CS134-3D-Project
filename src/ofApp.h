@@ -1,16 +1,14 @@
 #pragma once
 
 #include "ofMain.h"
-#include  "ofxAssimpModelLoader.h"
-#include "box.h"
-#include "ray.h"
+#include "Box.h"
+#include "Ray.h"
 #include "ParticleSystem.h"
-#include "ParticleEmitter.h"
-#include "TransformObject.h"
 #include <glm/gtx/intersect.hpp>
-#include "EntityBase.h"
+#include "EntityLander.h"
+#include "InputHandler.h"
 #include "ofxGui.h"
-#include "Octree.h"
+#include "Terrain.h"
 
 class ofApp : public ofBaseApp {
 
@@ -41,18 +39,17 @@ public:
 	glm::vec3 getMousePointOnPlane(glm::vec3 planePt, glm::vec3 planeNorm);
 	void drawBox(const Box &box);
 	Box meshBounds(const ofMesh &);
-	bool raySelectWithOctree(ofVec3f &pointRet);
 
 	void collisionDetection();
 
 	ofEasyCam cam;
 	ofCamera top;
 	ofCamera *theCam;
-	EntityBase lander;
-	ofxAssimpModelLoader terrain;
+
+	EntityLander lander = EntityLander("geo/landerTest1.obj");
+	Terrain terrain = Terrain("geo/terrain.obj", 7);
+
 	ofLight light;
-	Box boundingBox;
-	Box landerBounds;
 
 
 	vector<Box> colBoxList;
@@ -70,8 +67,8 @@ public:
 	bool bDisplayOctree = false;
 	vector<Box> bboxList;
 	void checkDistToPath();
-	ofVec3f selectedPoint;
-	ofVec3f intersectPoint;
+	glm::vec3 selectedPoint;
+	glm::vec3 intersectPoint;
 
 	glm::vec3 mouseDownPos;
 
@@ -80,12 +77,9 @@ public:
 
 
 	bool bLanderOut;
-	Box landerBox;
 	Box testBox;
 	Box pathBox;
 	
-	Octree octree;
-	TreeNode selectedNode;
 	glm::vec3  mouseLastPos;
 	bool bInDrag = false;
 	bool startEngine = false;
@@ -93,15 +87,12 @@ public:
 	ofxPanel gui;
 	//const float selectionRange = 4.0;
 
-	ParticleEmitter engineEmitter;
-
-
 	void drawPath(Box landerBox);
 
 	TurbulenceForce* turbForce;
 	GravityForce* gravityForce;
 	ThrustForce* engineForce;
 
-
+	InputHandler inputHandler;
 
 };

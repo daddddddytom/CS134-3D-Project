@@ -1,52 +1,17 @@
-
-//--------------------------------------------------------------
-//
-//  CS134 - Game Development
-//
-//  3D Model Drag and Drop and Ray Tracing Selection - startup scene
-// 
-//  This is an openFrameworks 3D scene that includes an EasyCam
-//  and example 3D geometry which I have modelled in Houdini that
-//  represents lunar terrain.
-//
-//  You will use this source file (and include file) as a starting point
-// 
-//  Please do not modify any of the keymappings.  I would like 
-//  the input interface to be the same for each student's 
-//  work.  Please also add your name/date below.
-//
-//  Please document/comment all of your work !
-//  Have Fun !!
-//
-//  Kevin Smith   10-20-19
-//
-//  Student Name:   < Your Name goes Here >
-//  Date: <date of last version>
-
-
 #include "ofApp.h"
 #include "Util.h"
 #include "Octree.h"
-//#include <glm / gtx / intersect.hpp>
-
-
+#include <glm/gtx/intersect.hpp>
 
 //--------------------------------------------------------------
 // setup scene, lighting, state and load geometry
 //
 void ofApp::setup() {
-
-
 	gravityForce = new GravityForce(ofVec3f(0, 10, 0));
-	engineForce = new ThrustForce(ofVec3f(0, -20, 0));
 
-	lander.setPosition(200,300,200);
+	lander.setPosition(200, 300, 200);
 
-	//octree.create(terrain.getMesh(0), 20);
-
-
-	
-	pathBox = Box(glm::vec3(0,0,0), glm::vec3(200,300,200));
+	pathBox = Box(glm::vec3(0, 0, 0), glm::vec3(200, 300, 200));
 
 	bWireframe = false;
 	bDisplayPoints = false;
@@ -62,6 +27,7 @@ void ofApp::setup() {
 	cam.disableMouseInput();
 	ofEnableSmoothing();
 	ofEnableDepthTest();
+	cam.setPosition(200, 400, 200);
 
 	// setup rudimentary lighting 
 	//
@@ -72,45 +38,6 @@ void ofApp::setup() {
 	//
 	gui.setup();
 	gui.add(numLevels.setup("Number of Octree Levels", 1, 1, 10));
-	
-	lander.loadModel("geo/landerTest1.obj");
-	lander.setScaleNormalization(false);
-	bLanderLoaded = true;
-
-	terrain.loadModel("geo/terrain2.obj");
-	terrain.setScaleNormalization(false);
-
-	//  Create Octree for testing.
-	//
-
-	ofResetElapsedTimeCounter();
-	octree.create(terrain.getMesh(0), 10);
-	float t = ofGetElapsedTimeMillis();
-	cout << "Build tree time in milliseconds:" << t << endl;
-	cout << "Number of Verts: " << terrain.getMesh(0).getNumVertices() << endl;
-
-	
-
-	
-
-	boundingBox = meshBounds(terrain.getMesh(0));
-
-
-
-	engineEmitter.sys->addForce(engineForce);
-	engineEmitter.setEmitterType(DiscEmitter);
-	engineEmitter.setPosition(lander.getPosition());
-	engineEmitter.setLifespan(1);
-	engineEmitter.setGroupSize(20);
-	engineEmitter.setParticleRadius(.02);
-	engineEmitter.radius = .5;
-	engineEmitter.setVelocity(ofVec3f(0, 0, 0));
-	engineEmitter.start();
-
-
-
-
-
 
 
 }
@@ -119,113 +46,94 @@ void ofApp::setup() {
 // incrementally update scene (animation)
 //
 void ofApp::update() {
-	ofVec3f min = lander.getSceneMin() + lander.getPosition();
-	ofVec3f max = lander.getSceneMax() + lander.getPosition();
-	landerBox = Box(glm::vec3(min.x, min.y, min.z), glm::vec3(max.x, max.y, max.z));
-	//cout << landerBox.center()<<endl;
-
 	checkDistToPath();
 	if (bLanderOut) {
 		cout << "Mission failed: Lander too far way from path" << endl;
 	}
 
-	collisionDetection();
-	lander.integrate();
-	land();
-	if (startEngine) {
-		engineEmitter.setRate(20);
-	}
-	else {
-		engineEmitter.setRate(0);
-	}
-	engineEmitter.update();
-	engineEmitter.setPosition(lander.getPosition() + ofVec3f(0, 1, 0));
 
-	
+	// check input
+	if (inputHandler.getInputState(InputHandler::SPACE)) {
+		lander.thrusterOn = true;
+	} else {
+		lander.thrusterOn = false;
+	}
+
+	if (inputHandler.getInputState(InputHandler::A)) {
+		lander.addTorque(glm::vec3(0, 0, 0.1));
+	}
+	if (inputHandler.getInputState(InputHandler::D)) {
+		lander.addTorque(glm::vec3(0, 0, -0.1));
+	}
+
+	if (inputHandler.getInputState(InputHandler::W)) {
+		lander.addTorque(glm::vec3(0.1, 0, 0));
+	}
+
+	if (inputHandler.getInputState(InputHandler::S)) {
+		lander.addTorque(glm::vec3(0, 0, -0.1));
+	}
+
+	collisionDetection();
+	lander.update();
+	land();
+
+
 }
 //--------------------------------------------------------------
 void ofApp::draw() {
 
 	ofBackground(ofColor::black);
-	
+
 	glDepthMask(false);
 	gui.draw();
 	glDepthMask(true);
 	ofSetColor(255, 255, 255);
 	cam.begin();
-	engineEmitter.draw();
 	ofPushMatrix();
-	drawPath(landerBox);
-	if (bWireframe) {                    // wireframe mode  (include axis)
-		ofDisableLighting();
-		ofSetColor(ofColor::slateGray);
-		terrain.drawWireframe();
-		if (bLanderLoaded) {
-			lander.drawWireframe();
-			if (!bTerrainSelected) drawAxis(lander.getPosition());
-		}
-		if (bTerrainSelected) drawAxis(ofVec3f(0, 0, 0));
-	}
-	else {
-		ofEnableLighting();              // shaded mode
-		terrain.drawFaces();
-		ofMesh mesh;
-		if (bLanderLoaded) {
-			lander.drawFaces();
-			if (!bTerrainSelected) drawAxis(lander.getPosition());
-			if (bDisplayBBoxes) {
-				ofNoFill();
-				ofSetColor(ofColor::white);
-				for (int i = 0; i < lander.getNumMeshes(); i++) {
-					ofPushMatrix();
-					ofMultMatrix(lander.getModelMatrix());
-					ofRotate(-90, 1, 0, 0);
-					Octree::drawBox(bboxList[i]);
-					ofPopMatrix();
-				}
-			}
+	drawPath(lander.getHitbox());
 
-			if (bLanderSelected) {
-
-				ofVec3f min = lander.getSceneMin() + lander.getPosition();
-				ofVec3f max = lander.getSceneMax() + lander.getPosition();
-
-				Box bounds = Box(glm::vec3(min.x, min.y, min.z), glm::vec3(max.x, max.y, max.z));
-				ofNoFill();
-				//ofSetColor(ofColor::white);
-				Octree::drawBox(bounds);
-
-				// draw colliding boxes
-				//
-				ofSetColor(ofColor::red);
-				for (int i = 0; i < colBoxList.size(); i++) {
-					Octree::drawBox(colBoxList[i]);
-				}
-			}
+	ofEnableLighting();              // shaded mode
+	terrain.drawFaces();
+	ofMesh mesh;
+	lander.draw();
+	if (!bTerrainSelected) drawAxis(lander.getPosition());
+	if (bDisplayBBoxes) {
+		ofNoFill();
+		ofSetColor(ofColor::white);
+		for (int i = 0; i < lander.getNumMeshes(); i++) {
+			ofPushMatrix();
+			ofMultMatrix(lander.getModelMatrix());
+			ofRotate(-90, 1, 0, 0);
+			Octree::drawBox(bboxList[i]);
+			ofPopMatrix();
 		}
 	}
+
+	if (bLanderSelected) {
+
+		ofVec3f min = lander.getSceneMin() + lander.getPosition();
+		ofVec3f max = lander.getSceneMax() + lander.getPosition();
+
+		Box bounds = Box(glm::vec3(min.x, min.y, min.z), glm::vec3(max.x, max.y, max.z));
+		ofNoFill();
+		//ofSetColor(ofColor::white);
+		Octree::drawBox(bounds);
+
+		// draw colliding boxes
+		//
+		ofSetColor(ofColor::red);
+		for (int i = 0; i < colBoxList.size(); i++) {
+			Octree::drawBox(colBoxList[i]);
+		}
+	}
+	
 	if (bTerrainSelected) drawAxis(ofVec3f(0, 0, 0));
-
-
-
-	if (bDisplayPoints) {                // display points as an option    
-		glPointSize(3);
-		ofSetColor(ofColor::green);
-		terrain.drawVertices();
-	}
 
 	if (bDisplayOctree) {
 		ofNoFill();
 		ofSetColor(ofColor::white);
-		octree.draw(numLevels, 0);
-	}
-
-
-	// highlight selected point (draw sphere around selected point)
-	//
-	if (bPointSelected) {
-		ofSetColor(ofColor::blue);
-		ofDrawSphere(selectedPoint, .1);
+		terrain.octree.draw(numLevels, 0);
 	}
 
 
@@ -235,15 +143,6 @@ void ofApp::draw() {
 	int level = 0;
 	//	ofNoFill();
 
-
-	// if point selected, draw a sphere
-	//
-	if (pointSelected) {
-		ofVec3f p = octree.mesh.getVertex(selectedNode.points[0]);
-		ofVec3f d = p - cam.getPosition();
-		ofSetColor(ofColor::lightGreen);
-		ofDrawSphere(p, .02 * d.length());
-	}
 
 	ofPopMatrix();
 	cam.end();
@@ -279,12 +178,11 @@ void ofApp::drawAxis(ofVec3f location) {
 void ofApp::checkDistToPath() {
 	glm::vec3 boxCenter = glm::vec3(pathBox.center().x, pathBox.center().y, pathBox.center().z);
 	glm::vec3 landerPos = glm::vec3(lander.getPosition().x, lander.getPosition().y, lander.getPosition().z);
-	float dist = glm::distance(boxCenter,landerPos);
+	float dist = glm::distance(boxCenter, landerPos);
 	//cout << dist << endl;
 	if (dist > 500) {
 		bLanderOut = true;
-	}
-	else {
+	} else {
 		bLanderOut = false;
 	}
 }
@@ -294,14 +192,14 @@ void ofApp::checkDistToPath() {
 
 void ofApp::drawPath(Box landerBox) {
 	ofPushMatrix();
-	
+
 	//ofSetColor(0x000000);
 	ofNoFill();
 
-	
-	ofDrawBezier(0,0,0,10,450,100,200,150,100, 200,300,200);
 
-	
+	ofDrawBezier(0, 0, 0, 10, 450, 100, 200, 150, 100, 200, 300, 200);
+
+
 	//ofDrawLine(ofPoint(400, 600, 0), ofPoint(landerBox.center().x, landerBox.center().y, landerBox.center().z));
 
 
@@ -313,7 +211,7 @@ void ofApp::drawPath(Box landerBox) {
 
 
 void ofApp::keyPressed(int key) {
-	
+
 	switch (key) {
 	case 'C':
 	case 'c':
@@ -330,9 +228,6 @@ void ofApp::keyPressed(int key) {
 	case 'r':
 		cam.reset();
 		break;
-	case 's':
-		savePicture();
-		break;
 	case 'O':
 	case 'o':
 		bDisplayOctree = !bDisplayOctree;
@@ -346,9 +241,6 @@ void ofApp::keyPressed(int key) {
 		togglePointsDisplay();
 		break;
 	case 'V':
-		break;
-	case 'w':
-		toggleWireframeMode();
 		break;
 	case OF_KEY_ALT:
 		cam.enableMouseInput();
@@ -368,24 +260,36 @@ void ofApp::keyPressed(int key) {
 		theCam = &top;
 		break;
 	case OF_KEY_UP:
-		
-		lander.force += ofVec3f(0, 1, 0);
-		startEngine = true;
+		inputHandler.setInputState(InputHandler::UP, true);
 		break;
 	case OF_KEY_DOWN:
-		
-		lander.force += ofVec3f(0, -1, 0);
-
+		inputHandler.setInputState(InputHandler::DOWN, true);
 		break;
 	case OF_KEY_LEFT:
-		
-	//	ofVec3f
-		lander.force += ofVec3f(0,0,-1);
+		inputHandler.setInputState(InputHandler::LEFT, true);
 		break;
 
 	case OF_KEY_RIGHT:
-		
-		lander.force += ofVec3f(0, 0, 1);
+		inputHandler.setInputState(InputHandler::RIGHT, true);
+		break;
+	case ' ':
+		inputHandler.setInputState(InputHandler::SPACE, true);
+		break;
+	case 'a':
+	case 'A':
+		inputHandler.setInputState(InputHandler::A, true);
+		break;
+	case 's':
+	case 'S':
+		inputHandler.setInputState(InputHandler::S, true);
+		break;
+	case 'd':
+	case 'D':
+		inputHandler.setInputState(InputHandler::D, true);
+		break;
+	case 'w':
+	case 'W':
+		inputHandler.setInputState(InputHandler::W, true);
 		break;
 	default:
 		break;
@@ -418,17 +322,36 @@ void ofApp::keyReleased(int key) {
 	case OF_KEY_SHIFT:
 		break;
 	case OF_KEY_UP:
-		lander.force = ofVec3f(0, 0, 0);
-		startEngine = false;
+		inputHandler.setInputState(InputHandler::UP, false);
 		break;
 	case OF_KEY_DOWN:
-		lander.force = ofVec3f(0, 0, 0);
+		inputHandler.setInputState(InputHandler::DOWN, false);
 		break;
 	case OF_KEY_LEFT:
-		lander.force = ofVec3f(0, 0, 0);
+		inputHandler.setInputState(InputHandler::LEFT, false);
 		break;
+
 	case OF_KEY_RIGHT:
-		lander.force = ofVec3f(0, 0, 0);
+		inputHandler.setInputState(InputHandler::RIGHT, false);
+		break;
+	case ' ':
+		inputHandler.setInputState(InputHandler::SPACE, false);
+		break;
+	case 'a':
+	case 'A':
+		inputHandler.setInputState(InputHandler::A, false);
+		break;
+	case 's':
+	case 'S':
+		inputHandler.setInputState(InputHandler::S, false);
+		break;
+	case 'd':
+	case 'D':
+		inputHandler.setInputState(InputHandler::D, false);
+		break;
+	case 'w':
+	case 'W':
+		inputHandler.setInputState(InputHandler::W, false);
 		break;
 	default:
 		break;
@@ -474,21 +397,10 @@ void ofApp::mousePressed(int x, int y, int button) {
 			mouseDownPos = getMousePointOnPlane(lander.getPosition(), cam.getZAxis());
 			mouseLastPos = mouseDownPos;
 			bInDrag = true;
-		}
-		else {
+		} else {
 			bLanderSelected = false;
 		}
 	}
-	else {
-		ofVec3f p;
-		ofResetElapsedTimeCounter();
-
-		raySelectWithOctree(p);
-		float t = ofGetElapsedTimeMicros();
-		cout << "Time for ray intersection in microsecond: " << t << endl;
-	}
-
-
 
 
 }
@@ -539,7 +451,7 @@ void ofApp::mouseDragged(int x, int y, int button) {
 	// 
 	//  implement your code here to drag the lander around
 	//lander.setPosition(0, 0, 0);
-	
+
 }
 
 //--------------------------------------------------------------
@@ -578,80 +490,21 @@ void ofApp::gotMessage(ofMessage msg) {
 
 
 //Collision Detection
-void ofApp::collisionDetection(){
-	glm::vec3 c = landerBox.center();
-	ofVec3f foot1 = ofVec3f(c.x + landerBox.width() / 2, c.y - landerBox.height() / 2, c.z + landerBox.width() / 2);
-	ofVec3f foot2 = ofVec3f(c.x - landerBox.width() / 2, c.y - landerBox.height() / 2, c.z + landerBox.width() / 2);
-	ofVec3f foot3 = ofVec3f(c.x + landerBox.width() / 2, c.y - landerBox.height() / 2, c.z - landerBox.width() / 2);
-	ofVec3f foot4 = ofVec3f(c.x - landerBox.width() / 2, c.y - landerBox.height() / 2, c.z - landerBox.width() / 2);
-	//cout << landerBox.width() / 2 << endl;
-	TreeNode node;
-
-	octree.intersect(foot1, octree.root, node);
-	if (node.points.size() > 0) {
+void ofApp::collisionDetection() {
+	if (terrain.overlap(lander.getHitbox())) {
 		bCollision = true;
-
-		
-	}
-
-	octree.intersect(foot2, octree.root, node);
-	if (node.points.size() > 0) {
-		bCollision = true;
-
-
-	}
-
-	octree.intersect(foot3, octree.root, node);
-	if (node.points.size() > 0) {
-		bCollision = true;
-
-
-	}
-
-	octree.intersect(foot4, octree.root, node);
-	if (node.points.size() > 0) {
-		bCollision = true;
-
-
-	}
-
-
-	
-
-
-}
-void ofApp::land()
-{
-
-	
-	if (bCollision) {
-		cout << "collison detected" << endl;
+	} else {
 		bCollision = false;
 	}
-	
 }
 
-
-
-bool ofApp::raySelectWithOctree(ofVec3f &pointRet) {
-	ofVec3f mouse(mouseX, mouseY);
-	ofVec3f rayPoint = cam.screenToWorld(mouse);
-	ofVec3f rayDir = rayPoint - cam.getPosition();
-	rayDir.normalize();
-	Ray ray = Ray(glm::vec3(rayPoint.x, rayPoint.y, rayPoint.z),
-		glm::vec3(rayDir.x, rayDir.y, rayDir.z));
-
-	pointSelected = octree.intersect(ray, octree.root, selectedNode);
-
-	if (pointSelected) {
-		pointRet = octree.mesh.getVertex(selectedNode.points[0]);
+void ofApp::land() {
+	if (bCollision) {
+		cout << "collision detected" << endl;
+		bCollision = false;
 	}
-	return pointSelected;
+
 }
-
-
-
-
 
 //--------------------------------------------------------------
 // setup basic ambient lighting in GL  (for now, enable just 1 light)
@@ -698,57 +551,7 @@ void ofApp::savePicture() {
 	cout << "picture saved" << endl;
 }
 
-//--------------------------------------------------------------
-//
-// support drag-and-drop of model (.obj) file loading.  when
-// model is dropped in viewport, place origin under cursor
-//
 void ofApp::dragEvent(ofDragInfo dragInfo) {
-	if (lander.loadModel(dragInfo.files[0])) {
-		bLanderLoaded = true;
-		lander.setScaleNormalization(false);
-		//	lander.setScale(.5, .5, .5);
-		lander.setPosition(0, 0, 0);
-		//		lander.setRotation(1, 180, 1, 0, 0);
-
-				// We want to drag and drop a 3D object in space so that the model appears 
-				// under the mouse pointer where you drop it !
-				//
-				// Our strategy: intersect a plane parallel to the camera plane where the mouse drops the model
-				// once we find the point of intersection, we can position the lander/lander
-				// at that location.
-				//
-
-				// Setup our rays
-				//
-		glm::vec3 origin = theCam->getPosition();
-		glm::vec3 camAxis = theCam->getZAxis();
-		glm::vec3 mouseWorld = theCam->screenToWorld(glm::vec3(mouseX, mouseY, 0));
-		glm::vec3 mouseDir = glm::normalize(mouseWorld - origin);
-		float distance;
-
-		bool hit = glm::intersectRayPlane(origin, mouseDir, glm::vec3(0, 0, 0), camAxis, distance);
-		if (hit) {
-			// find the point of intersection on the plane using the distance 
-			// We use the parameteric line or vector representation of a line to compute
-			//
-			// p' = p + s * dir;
-			//
-			glm::vec3 intersectPoint = origin + distance * mouseDir;
-
-			// Now position the lander's origin at that intersection point
-			//
-			glm::vec3 min = lander.getSceneMin();
-			glm::vec3 max = lander.getSceneMax();
-			float offset = (max.y - min.y) / 2.0;
-			lander.setPosition(intersectPoint.x, intersectPoint.y - offset, intersectPoint.z);
-
-			// set up bounding box for lander while we are at it
-			//
-			landerBounds = Box(glm::vec3(min.x, min.y, min.z), glm::vec3(max.x, max.y, max.z));
-		}
-	}
-
 
 }
 
@@ -776,8 +579,7 @@ glm::vec3 ofApp::getMousePointOnPlane(glm::vec3 planePt, glm::vec3 planeNorm) {
 		glm::vec3 intersectPoint = origin + distance * mouseDir;
 
 		return intersectPoint;
-	}
-	else return glm::vec3(0, 0, 0);
+	} else return glm::vec3(0, 0, 0);
 }
 
 

@@ -15,7 +15,7 @@ What ofxAssimpModelLoader doesn't have:
 - collision checks
 */
 class EntityBase : public ofxAssimpModelLoader {
-public:
+protected:
 	Box hitbox;
 	
 	glm::vec3 force = glm::vec3(0, 0, 0);
@@ -39,10 +39,15 @@ public:
 	virtual bool intersect(const Ray &ray);
 	virtual bool overlap(const Box &box);
 
+	Box getHitbox() {
+		return hitbox;
+	}
+	
 	// physics
 	virtual void integrate();
 	
-
+	void addForce(glm::vec3 quantity);
+	void addTorque(glm::vec3 quantity);
 
 	
 

@@ -7,6 +7,7 @@
 #define EntityLander_h
 #include "EntityBase.h"
 #include "ParticleEmitter.h"
+#include "ParticleSystem.h"
 
 class EntityLander : public EntityBase {
 protected:
@@ -18,13 +19,13 @@ protected:
 
 	// thruster go brrrr
 	ParticleEmitter mainThruster;
+	ThrustForce thrustforce = ThrustForce(glm::vec3(0, -20, 0));
 
 public:
-	EntityLander() {
-		glm::vec3 heading = glm::vec3(pos.x, pos.y+.1, pos.z);
-		glm::vec3 horizontalAxis = glm::vec3(pos.x+.1, pos.y, pos.z);
-		glm::vec3 normalAxis = glm::vec3(pos.x, pos.y, pos.z+.1);
-	}
+	bool thrusterOn = false;
+
+	EntityLander(string fileName);
+
 	glm::vec3 get_heading() const {
 		return heading;
 	}
@@ -57,7 +58,7 @@ public:
 		this->fuel = fuel;
 	}
 
-	void setRotation(int which, float angle, float rot_x, float rot_y, float r_z);
+	void update();
 
 	void draw();
 

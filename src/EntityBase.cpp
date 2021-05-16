@@ -50,38 +50,45 @@ bool EntityBase::overlap(const Box& box) {
 
 void EntityBase::integrate() {
 	// delta time
-	float dt = 1.0 / 60;
-
+	float dt = 1.0f / 60;
+	
 	// s(t) = vt
 	pos += velocity * dt;
 
 	// F = ma; a = F/m
-	ofVec3f accel = (force / mass);
+	glm::vec3 accel = (force / mass);
 
-	// v(t + dt) = v(t) + a(t) * dt 
+	// v(t + dt) = v(t) + a(t) * dt
 	velocity += accel * dt;
 
 	// angular accel = torque / I (completely arbitrary)
-	glm::vec3 angularAccel = 1000 * torque / mass;
+	glm::vec3 angularAccel = torque / mass;
 
 	// update dTheta
 	dTheta += angularAccel;
 
 	// angular velocity = change in theta / change in time
-	this->setRotation(0, dTheta.x, 1, 0, 0);
-	this->setRotation(1, dTheta.y, 0, 1, 0);
-	this->setRotation(2, dTheta.z, 0, 0, 1);
+	this->setRotation(0, this->getRotationAngle(0) + dTheta.x, 1, 0, 0);
+	this->setRotation(1, this->getRotationAngle(1) + dTheta.y, 0, 1, 0);
+	this->setRotation(2, this->getRotationAngle(2) + dTheta.z, 0, 0, 1);
 
 	// damping
 	velocity *= damping;
 	dTheta *= damping;
 
 	// clear forces
-	//force = glm::vec3(0, 0, 0);
+	force = glm::vec3(0, 0, 0);
 	torque = glm::vec3(0, 0, 0);
 	
 }
 
+void EntityBase::addForce(glm::vec3 quantity) {
+	this->force += quantity;
+}
+
+void EntityBase::addTorque(glm::vec3 quantity) {
+	this->torque += quantity;
+}
 
 
 
