@@ -8,10 +8,7 @@
 EntityLander::EntityLander(string fileName) {
 	this->loadModel(fileName);
 	this->setScaleNormalization(false);
-	glm::vec3 heading = glm::vec3(pos.x, pos.y + 1, pos.z);
-	glm::vec3 horizontalAxis = glm::vec3(pos.x + 1, pos.y, pos.z);
-	glm::vec3 normalAxis = glm::vec3(pos.x, pos.y, pos.z + 1);
-
+	
 	mainThruster.sys->addForce(&thrustforce);
 	mainThruster.setEmitterType(DiscEmitter);
 	mainThruster.setPosition(this->getPosition());
@@ -26,9 +23,29 @@ EntityLander::EntityLander(string fileName) {
 void EntityLander::update() {
 	if (thrusterOn) {
 		mainThruster.setRate(10);
-		this->force += (this->heading - this->getPosition()) * 0.1;
-	} else {
+		this->force += head() * 10;
+	} 
+	else {
 		mainThruster.setRate(0);
+	}
+
+	if (rotateZACW) {
+		torqueZ += 100;
+	}
+	else if (rotateZCW) {
+		torqueZ -= 100;
+	}
+	else if (!rotateZCW && !rotateZACW){
+		torqueZ = 0.0f;
+	}
+	if (rotateXACW) {
+		torqueX += 100;
+	}
+	else if (rotateXCW) {
+		torqueX -= 100;
+	}
+	else if (!rotateXCW && !rotateXACW) {
+		torqueX = 0.0f;
 	}
 
 	mainThruster.update();
@@ -57,3 +74,5 @@ void EntityLander::draw() {
 	// Draw the particles
 	this->mainThruster.draw();
 }
+
+

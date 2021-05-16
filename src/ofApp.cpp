@@ -60,18 +60,39 @@ void ofApp::update() {
 	}
 
 	if (inputHandler.getInputState(InputHandler::A)) {
-		lander.addTorque(glm::vec3(0, 0, 0.1));
+		//lander.addTorque(glm::vec3(0, 0, -0.1));
+		lander.rotateZACW = true;
+	}
+	else  {
+
+		lander.rotateZACW = false;
+		//cout << lander.rotateHeading << endl;
 	}
 	if (inputHandler.getInputState(InputHandler::D)) {
-		lander.addTorque(glm::vec3(0, 0, -0.1));
+		//lander.addTorque(glm::vec3(0, 0, -0.1));
+		lander.rotateZCW = true;
 	}
+	else {
+
+		lander.rotateZCW = false;
+		//cout << lander.rotateHeading << endl;
+	}
+	
 
 	if (inputHandler.getInputState(InputHandler::W)) {
-		lander.addTorque(glm::vec3(0.1, 0, 0));
+		//lander.addTorque(glm::vec3(0.1, 0, 0));
+		lander.rotateXACW = true;
+	}
+	else {
+		lander.rotateXACW = false;
 	}
 
 	if (inputHandler.getInputState(InputHandler::S)) {
-		lander.addTorque(glm::vec3(0, 0, -0.1));
+		//lander.addTorque(glm::vec3(-0.1, 0, 0));
+		lander.rotateXCW = true;
+	}
+	else {
+		lander.rotateXCW = false;
 	}
 
 	collisionDetection();
@@ -87,6 +108,12 @@ void ofApp::draw() {
 
 	glDepthMask(false);
 	gui.draw();
+	string str1 = "torqueZ: " + std::to_string(lander.torqueZ);
+	string str2 = "torqueX: " + std::to_string(lander.torqueX);
+	string str3 = "torqueY: " + std::to_string(lander.torqueY);
+	ofDrawBitmapString(str1, ofGetWindowWidth() -200, 15);
+	ofDrawBitmapString(str2, ofGetWindowWidth() -200, 30);
+	ofDrawBitmapString(str3, ofGetWindowWidth() -200, 45);
 	glDepthMask(true);
 	ofSetColor(255, 255, 255);
 	cam.begin();
@@ -211,7 +238,7 @@ void ofApp::drawPath(Box landerBox) {
 
 
 void ofApp::keyPressed(int key) {
-
+	cout << ofGetKeyPressed() << endl;
 	switch (key) {
 	case 'C':
 	case 'c':
@@ -336,10 +363,12 @@ void ofApp::keyReleased(int key) {
 		break;
 	case ' ':
 		inputHandler.setInputState(InputHandler::SPACE, false);
+		
 		break;
 	case 'a':
 	case 'A':
 		inputHandler.setInputState(InputHandler::A, false);
+		
 		break;
 	case 's':
 	case 'S':
