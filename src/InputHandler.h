@@ -8,7 +8,7 @@ private:
 	bool inputStates[9] = { false, false, false, false, false, false, false, false, false};
 
 public:
-	enum Input { UP, DOWN, LEFT, RIGHT, SPACE, A, W, S, D };
+	enum Input { UP, DOWN, LEFT, RIGHT, SPACE, A, W, S, D, Q, E };
 
 	InputHandler() {}
 

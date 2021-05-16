@@ -28,7 +28,20 @@ void EntityLander::update() {
 	else {
 		mainThruster.setRate(0);
 	}
+	if (XRthrusterOn) {
+		this->force += right() * 10;
+	}
+	if (XLthrusterOn) {
+		this->force -= right() * 10;
+	}
+	if (ZRthrusterOn) {
+		
+		this->force += back() * 10;
+	}
+	if (ZLthrusterOn) {
 
+		this->force -= back() * 10;
+	}
 	if (rotateZACW) {
 		torqueZ += 100;
 	}
@@ -46,6 +59,29 @@ void EntityLander::update() {
 	}
 	else if (!rotateXCW && !rotateXACW) {
 		torqueX = 0.0f;
+	}
+
+	if (rotateYACW) {
+		torqueY += 100;
+	}
+	else if (rotateYCW) {
+		torqueY -= 100;
+	}
+	else if (!rotateYCW && !rotateYACW) {
+		torqueY = 0.0f;
+	}
+
+	if (rotationX >= 20) {
+		rotationX = 20;
+	}
+	if (rotationX <= -20) {
+		rotationX = -20;
+	}
+	if (rotationZ >= 20) {
+		rotationZ = 20;
+	}
+	if (rotationZ <= -20) {
+		rotationZ = -20;
 	}
 
 	mainThruster.update();

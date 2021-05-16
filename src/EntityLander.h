@@ -28,6 +28,10 @@ protected:
 
 public:
 	bool thrusterOn = false;
+	bool XLthrusterOn = false;
+	bool XRthrusterOn = false;
+	bool ZLthrusterOn = false;
+	bool ZRthrusterOn = false;
 	bool rotateZACW = false;
 	bool rotateZCW = false;
 	bool rotateXACW = false;
@@ -87,10 +91,32 @@ public:
 		glm::vec3 initialHeading = glm::vec3(0, 1, 0);    // heading at start
 		glm::mat4 MrotZ = glm::rotate(glm::mat4(1.0), glm::radians(rotationZ), glm::vec3(0, 0, 1));
 		glm::mat4 MrotX = glm::rotate(glm::mat4(1.0), glm::radians(rotationX), glm::vec3(1, 0, 0));
-		glm::mat4 MrotY = glm::rotate(glm::mat4(1.0), glm::radians(rotationY), glm::vec3(0, 0, 1));
+		glm::mat4 MrotY = glm::rotate(glm::mat4(1.0), glm::radians(rotationY), glm::vec3(0, 1, 0));
 		glm::vec3 h = MrotZ * glm::vec4(initialHeading, 1);
-		//h = MrotX * glm::vec4(h, 1);
-		//h = MrotY * glm::vec4(h, 1);
+		h = MrotX * glm::vec4(h, 1);
+		h = MrotY * glm::vec4(h, 1);
+		return glm::normalize(h);
+	}
+
+	glm::vec3 right() {
+		glm::vec3 initialHeading = glm::vec3(1, 0, 0);    // horizontal right vector at start
+		glm::mat4 MrotZ = glm::rotate(glm::mat4(1.0), glm::radians(rotationZ), glm::vec3(0, 0, 1));
+		glm::mat4 MrotX = glm::rotate(glm::mat4(1.0), glm::radians(rotationX), glm::vec3(1, 0, 0));
+		glm::mat4 MrotY = glm::rotate(glm::mat4(1.0), glm::radians(rotationY), glm::vec3(0, 1, 0));
+		glm::vec3 h = MrotZ * glm::vec4(initialHeading, 1);
+		h = MrotX * glm::vec4(h, 1);
+		h = MrotY * glm::vec4(h, 1);
+		return glm::normalize(h);
+	}
+
+	glm::vec3 back() {
+		glm::vec3 initialHeading = glm::vec3(0, 0, 1);    // horizontal back vector at start
+		glm::mat4 MrotZ = glm::rotate(glm::mat4(1.0), glm::radians(rotationZ), glm::vec3(0, 0, 1));
+		glm::mat4 MrotX = glm::rotate(glm::mat4(1.0), glm::radians(rotationX), glm::vec3(1, 0, 0));
+		glm::mat4 MrotY = glm::rotate(glm::mat4(1.0), glm::radians(rotationY), glm::vec3(0, 1, 0));
+		glm::vec3 h = MrotZ * glm::vec4(initialHeading, 1);
+		h = MrotX * glm::vec4(h, 1);
+		h = MrotY * glm::vec4(h, 1);
 		return glm::normalize(h);
 	}
 

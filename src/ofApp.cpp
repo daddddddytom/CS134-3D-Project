@@ -95,6 +95,48 @@ void ofApp::update() {
 		lander.rotateXCW = false;
 	}
 
+	if (inputHandler.getInputState(InputHandler::Q)) {
+		//lander.addTorque(glm::vec3(0.1, 0, 0));
+		lander.rotateYACW = true;
+	}
+	else {
+		lander.rotateYACW = false;
+	}
+	if (inputHandler.getInputState(InputHandler::E)) {
+		//lander.addTorque(glm::vec3(0.1, 0, 0));
+		lander.rotateYCW = true;
+	}
+	else {
+		lander.rotateYCW = false;
+	}
+
+	if (inputHandler.getInputState(InputHandler::LEFT)) {
+		lander.XLthrusterOn = true;
+	}
+	else {
+		lander.XLthrusterOn = false;
+	}
+	if (inputHandler.getInputState(InputHandler::RIGHT)) {
+		lander.XRthrusterOn = true;
+	}
+	else {
+		lander.XRthrusterOn = false;
+	}
+	if (inputHandler.getInputState(InputHandler::UP)) {
+		lander.ZLthrusterOn = true;
+	}
+	else {
+		lander.ZLthrusterOn = false;
+	}
+	if (inputHandler.getInputState(InputHandler::DOWN)) {
+		lander.ZRthrusterOn = true;
+	}
+	else {
+		lander.ZRthrusterOn = false;
+	}
+
+
+
 	collisionDetection();
 	lander.update();
 	land();
@@ -318,6 +360,14 @@ void ofApp::keyPressed(int key) {
 	case 'W':
 		inputHandler.setInputState(InputHandler::W, true);
 		break;
+	case 'q':
+	case 'Q':
+		inputHandler.setInputState(InputHandler::Q, true);
+		break;
+	case 'e':
+	case 'E':
+		inputHandler.setInputState(InputHandler::E, true);
+		break;
 	default:
 		break;
 	}
@@ -381,6 +431,14 @@ void ofApp::keyReleased(int key) {
 	case 'w':
 	case 'W':
 		inputHandler.setInputState(InputHandler::W, false);
+		break;
+	case 'q':
+	case 'Q':
+		inputHandler.setInputState(InputHandler::Q, false);
+		break;
+	case 'e':
+	case 'E':
+		inputHandler.setInputState(InputHandler::E, false);
 		break;
 	default:
 		break;
