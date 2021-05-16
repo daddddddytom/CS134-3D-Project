@@ -5,6 +5,8 @@
 
 #include "EntityLander.h"
 
+#include "Octree.h"
+
 EntityLander::EntityLander(string fileName) {
 	this->loadModel(fileName);
 	this->setScaleNormalization(false);
@@ -81,20 +83,18 @@ void EntityLander::update() {
 	mainThruster.update();
 	mainThruster.setPosition(this->getPosition());
 
-	/*
-	glm::mat4 headingRotate = glm::rotate(glm::mat4(1), dTheta.x, glm::vec3(1, 0, 0))
-		* glm::rotate(glm::mat4(1), dTheta.y, glm::vec3(0, 1, 0))
-		* glm::rotate(glm::mat4(1), dTheta.z, glm::vec3(0, 0, 1));
-	heading += (this->getPosition() - this->heading);
-	heading += velocity / ofGetFrameRate();
-	*/
 	this->integrate();
 
-	/*
-	heading = headingRotate * glm::vec4(heading, 1);
-	horizontalAxis = glm::vec3(pos.x + 1, pos.y, pos.z);
-	normalAxis = glm::vec3(pos.x, pos.y, pos.z + 1);
-	*/
+	// update the hitbox
+	glm::vec3 min = this->getSceneMin();
+	glm::vec3 max = this->getSceneMax();
+	glm::mat4 MrotZ = glm::rotate(glm::mat4(1.0), glm::radians(rotationZ), glm::vec3(0, 0, 1));
+	glm::mat4 MrotX = glm::rotate(glm::mat4(1.0), glm::radians(rotationX), glm::vec3(1, 0, 0));
+	glm::mat4 MrotY = glm::rotate(glm::mat4(1.0), glm::radians(rotationY), glm::vec3(0, 1, 0));
+	min = MrotY * MrotX * MrotZ * glm::vec4(min, 1) + this->getPosition();
+	max = MrotY * MrotX * MrotZ * glm::vec4(max, 1) + this->getPosition();
+	hitbox = Box(glm::vec3(min.x, min.y, min.z), glm::vec3(max.x, max.y, max.z));
+	
 }
 
 void EntityLander::draw() {
@@ -103,6 +103,8 @@ void EntityLander::draw() {
 
 	// Draw the particles
 	this->mainThruster.draw();
+
+	Octree::drawBox(hitbox);
 }
 
 
