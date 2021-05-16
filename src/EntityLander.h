@@ -90,7 +90,7 @@ public:
 		glm::mat4 MrotY = glm::rotate(glm::mat4(1.0), glm::radians(rotationY), glm::vec3(0, 0, 1));
 		glm::vec3 h = MrotZ * glm::vec4(initialHeading, 1);
 		//h = MrotX * glm::vec4(h, 1);
-		//glm::vec3 h = MrotY * glm::vec4(initialHeading, 1);
+		//h = MrotY * glm::vec4(h, 1);
 		return glm::normalize(h);
 	}
 

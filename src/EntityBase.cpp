@@ -70,18 +70,17 @@ void EntityBase::integrate() {
 	dTheta += angularAccel;
 
 	// angular velocity = change in theta / change in time
+	// not all of these can run together or only the last on will be called
 	this->setRotation(0, rotationX , 1, 0, 0);
-	this->setRotation(0, rotationY , 0, 1, 0);
-	this->setRotation(0, rotationZ , 0, 0, 1);
-
-	
+	this->setRotation(1, rotationY , 0, 1, 0);
+	this->setRotation(2, rotationZ , 0, 0, 1);
 	
 	
 	angularVelocityZ += angularAccelerationZ * dt;
 	angularVelocityZ *= damping;
-	angularVelocityX += angularAccelerationZ * dt;
+	angularVelocityX += angularAccelerationX * dt;
 	angularVelocityX *= damping;
-	angularVelocityY += angularAccelerationZ * dt;
+	angularVelocityY += angularAccelerationY * dt;
 	angularVelocityY *= damping;
 	rotationZ += (angularVelocityZ * dt);
 	rotationX += (angularVelocityX * dt);
@@ -89,8 +88,6 @@ void EntityBase::integrate() {
 	angularAccelerationZ = torqueZ / mass; 
 	angularAccelerationX = torqueX / mass;
 	angularAccelerationY = torqueY / mass;
-	
-
 
 
 	// damping

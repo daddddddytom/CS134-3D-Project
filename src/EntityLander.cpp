@@ -31,38 +31,21 @@ void EntityLander::update() {
 
 	if (rotateZACW) {
 		torqueZ += 100;
-		
 	}
-	else if(rotateZACW) {
-		torqueZ = 0.0f;
-		
-	}
-
-	if (rotateZCW) {
+	else if (rotateZCW) {
 		torqueZ -= 100;
-
 	}
-	else {
+	else if (!rotateZCW && !rotateZACW){
 		torqueZ = 0.0f;
-
 	}
-
 	if (rotateXACW) {
 		torqueX += 100;
-
 	}
-	else {
+	else if (rotateXCW) {
+		torqueX -= 100;
+	}
+	else if (!rotateXCW && !rotateXACW) {
 		torqueX = 0.0f;
-
-	}
-
-	if (rotateXCW) {
-		torqueX += 100;
-
-	}
-	else {
-		torqueX = 0.0f;
-
 	}
 
 	mainThruster.update();

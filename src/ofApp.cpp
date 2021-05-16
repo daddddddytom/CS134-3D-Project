@@ -62,9 +62,8 @@ void ofApp::update() {
 	if (inputHandler.getInputState(InputHandler::A)) {
 		//lander.addTorque(glm::vec3(0, 0, -0.1));
 		lander.rotateZACW = true;
-		cout << lander.torqueZ << endl;
 	}
-	else if(inputHandler.getInputState(InputHandler::A) == false) {
+	else  {
 
 		lander.rotateZACW = false;
 		//cout << lander.rotateHeading << endl;
@@ -109,6 +108,12 @@ void ofApp::draw() {
 
 	glDepthMask(false);
 	gui.draw();
+	string str1 = "torqueZ: " + std::to_string(lander.torqueZ);
+	string str2 = "torqueX: " + std::to_string(lander.torqueX);
+	string str3 = "torqueY: " + std::to_string(lander.torqueY);
+	ofDrawBitmapString(str1, ofGetWindowWidth() -200, 15);
+	ofDrawBitmapString(str2, ofGetWindowWidth() -200, 30);
+	ofDrawBitmapString(str3, ofGetWindowWidth() -200, 45);
 	glDepthMask(true);
 	ofSetColor(255, 255, 255);
 	cam.begin();
@@ -233,7 +238,7 @@ void ofApp::drawPath(Box landerBox) {
 
 
 void ofApp::keyPressed(int key) {
-
+	cout << ofGetKeyPressed() << endl;
 	switch (key) {
 	case 'C':
 	case 'c':
