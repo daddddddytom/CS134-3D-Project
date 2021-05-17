@@ -12,6 +12,13 @@ void ofApp::setup() {
 	lander.setPosition(200, 300, 200);
 
 	pathBox = Box(glm::vec3(0, 0, 0), glm::vec3(200, 300, 200));
+	
+
+#ifdef TARGET_OPENGLES
+	shader.load("shaders_gles/shader");
+#else
+	shader.load("shaders/shader");
+#endif
 
 	bWireframe = false;
 	bDisplayPoints = false;
@@ -36,7 +43,7 @@ void ofApp::setup() {
 
 	theCam = &cam;
 
-
+	
 
 	ofEnableSmoothing();
 	ofEnableDepthTest();
@@ -165,7 +172,31 @@ void ofApp::update() {
 	land();
 
 
+
+
+
+
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //--------------------------------------------------------------
 void ofApp::draw() {
 
@@ -181,16 +212,21 @@ void ofApp::draw() {
 	ofDrawBitmapString(str3, ofGetWindowWidth() -200, 45);
 	glDepthMask(true);
 	ofSetColor(255, 255, 255);
-
+	
 	theCam->begin();
 	//cam.begin();
+
+	
+	
+	
+
 	ofPushMatrix();
 	drawPath(lander.getHitbox());
 
 	ofEnableLighting();              // shaded mode
 	terrain.drawFaces();
 	ofMesh mesh;
-	lander.draw();
+	
 	if (!bTerrainSelected) drawAxis(lander.getPosition());
 	if (bDisplayBBoxes) {
 		ofNoFill();
@@ -230,7 +266,7 @@ void ofApp::draw() {
 		terrain.octree.draw(numLevels, 0);
 	}
 
-
+	lander.draw();
 	// recursively draw octree
 	//
 	ofDisableLighting();
@@ -241,6 +277,11 @@ void ofApp::draw() {
 	ofPopMatrix();
 	//cam.end();
 	theCam->end();
+	shader.begin();
+	theCam->begin();
+	
+	theCam->end();
+	shader.end();
 }
 
 // 
@@ -711,3 +752,5 @@ bool ofApp::mouseIntersectPlane(glm::vec3 planePoint, glm::vec3 planeNorm, glm::
 	rayDir.normalize();
 	return (rayIntersectPlane(rayPoint, rayDir, planePoint, planeNorm, point));
 }
+
+

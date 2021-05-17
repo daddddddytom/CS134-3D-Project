@@ -46,7 +46,7 @@ public:
 	ofCamera top;
 	ofCamera *theCam;
 	ofCamera trackCam;
-
+	ofShader shader;
 	EntityLander lander = EntityLander("geo/landerTest1.obj");
 	Terrain terrain = Terrain("geo/terrain.obj", 7);
 
@@ -76,6 +76,7 @@ public:
 	void land();
 	const float selectionRange = 4.0;
 
+	
 
 	bool bLanderOut;
 	Box testBox;

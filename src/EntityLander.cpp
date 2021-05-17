@@ -22,6 +22,12 @@ EntityLander::EntityLander(string fileName) {
 	mainThruster.start();
 }
 
+
+
+
+
+
+
 void EntityLander::update() {
 	if (thrusterOn) {
 		mainThruster.setRate(10);
@@ -97,14 +103,76 @@ void EntityLander::update() {
 	
 }
 
+
+
+
+
+void EntityLander::loadVbo() {
+	if (mainThruster.sys->particles.size() < 1) return;
+
+	vector<ofVec3f> sizes;
+	vector<ofVec3f> points;
+	for (int i = 0; i < mainThruster.sys->particles.size(); i++) {
+		points.push_back(mainThruster.sys->particles[i].position);
+		sizes.push_back(ofVec3f(mainThruster.particleRadius));
+	}
+
+
+
+	int total = (int)points.size();
+	vbo.clear();
+	vbo.setVertexData(&points[0], total, GL_STATIC_DRAW);
+	vbo.setNormalData(&sizes[0], total, GL_STATIC_DRAW);
+}
+
+
+
+
+
 void EntityLander::draw() {
 	// Draw the lander.
 	EntityBase::draw(OF_MESH_FILL);
-
+	ofSetColor(255,255,255);
 	// Draw the particles
-	this->mainThruster.draw();
+//	this->mainThruster.draw();
 
-	Octree::drawBox(hitbox);
+
+
+
+
+
+	if (mainThruster.started) {
+		loadVbo();
+		glDepthMask(GL_FALSE);
+
+		// this makes everything look glowy :)
+		//
+		ofEnableBlendMode(OF_BLENDMODE_ADD);
+		ofEnablePointSprites();
+
+		// begin drawing in the camera
+		
+		//theCam->begin();
+		vbo.draw(GL_POINTS, 0, (int)mainThruster.sys->particles.size());
+
+		//  end drawing in the camera
+		//
+		//theCam->end();
+		
+
+		ofDisablePointSprites();
+		ofDisableBlendMode();
+		ofEnableAlphaBlending();
+
+		// set back the depth mask
+		//
+		glDepthMask(GL_TRUE);
+	}
+
+
+
+
+	//Octree::drawBox(hitbox);
 }
 
 

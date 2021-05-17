@@ -19,14 +19,17 @@ protected:
 	glm::vec3 normalAxis = glm::vec3(0, 0, 1);
 	
 
+	
+
+	
+
+public:
+
 	// basic logic stuff
 	float fuel;
-
 	// thruster go brrrr
 	ParticleEmitter mainThruster;
 	ThrustForce thrustforce = ThrustForce(head() * -10);
-
-public:
 	bool thrusterOn = false;
 	bool XLthrusterOn = false;
 	bool XRthrusterOn = false;
@@ -40,6 +43,17 @@ public:
 	bool rotateYCW = false;
 	bool rotateNormal = false;
 	
+
+
+
+
+	//shader
+	ofVbo vbo;
+	
+	
+	void loadVbo();
+
+
 	EntityLander(string fileName);
 
 	glm::vec3 get_heading() const {
@@ -81,6 +95,8 @@ public:
 	void set_fuel(float fuel) {
 		this->fuel = fuel;
 	}
+
+	
 
 	void update();
 
