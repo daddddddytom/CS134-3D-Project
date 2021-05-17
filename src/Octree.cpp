@@ -199,7 +199,7 @@ void Octree::subdivide(const ofMesh & mesh, TreeNode & node, int numLevels, int 
 
 bool Octree::intersect(const Ray &ray, const TreeNode & node, TreeNode & nodeRtn) {
 	bool intersects = false;
-	if (node.box.intersect(ray, -99999999, 10000000)) {
+	if (node.box.intersect(ray, 0, std::_Max_possible_v<float>)) {
 		if (node.children.size() == 0) {
 
 			nodeRtn = node;

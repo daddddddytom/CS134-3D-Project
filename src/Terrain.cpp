@@ -7,9 +7,10 @@
 #include "Terrain.h"
 
 
-bool Terrain::intersect(const Ray& ray) {
+glm::vec3 Terrain::intersect(const Ray& ray) {
 	TreeNode dummyNode;
-	return octree.intersect(ray, octree.root, dummyNode);
+	octree.intersect(ray, octree.root, dummyNode);
+	return glm::vec3(dummyNode.box.center().x, dummyNode.box.max().y, dummyNode.box.center().z);
 }
 
 bool Terrain::overlap(const Box& box) {

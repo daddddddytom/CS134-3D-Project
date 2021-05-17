@@ -17,11 +17,11 @@ protected:
 	glm::vec3 heading = glm::vec3(0, 1, 0);
 	glm::vec3 horizontalAxis = glm::vec3(1, 0, 0);
 	glm::vec3 normalAxis = glm::vec3(0, 0, 1);
-	
 
-	
 
-	
+
+
+
 
 public:
 
@@ -42,15 +42,11 @@ public:
 	bool rotateYACW = false;
 	bool rotateYCW = false;
 	bool rotateNormal = false;
-	
-
-
-
 
 	//shader
 	ofVbo vbo;
-	
-	
+
+
 	void loadVbo();
 
 
@@ -59,14 +55,6 @@ public:
 	glm::vec3 get_heading() const {
 		return heading;
 	}
-
-
-	
-
-
-
-
-
 
 	void set_heading(const glm::vec3& heading) {
 		this->heading = heading;
@@ -96,12 +84,12 @@ public:
 		this->fuel = fuel;
 	}
 
-	
+
 
 	void update();
 
 	void draw();
-	
+
 
 	glm::vec3 head() {
 		glm::vec3 initialHeading = glm::vec3(0, 1, 0);    // heading at start
@@ -136,6 +124,7 @@ public:
 		return glm::normalize(h);
 	}
 
+	float getAltitude(Terrain& terrain);
 };
 
 

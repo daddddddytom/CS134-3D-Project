@@ -8,6 +8,9 @@
 #ifndef EntityTerrain_hpp
 #define EntityTerrain_hpp
 
+#include <glm/detail/_noise.hpp>
+#include <glm/detail/_noise.hpp>
+
 #include "ofxAssimpModelLoader.h"
 #include "Octree.h"
 
@@ -22,8 +25,8 @@ public:
 		setScaleNormalization(false);
 		octree.create(this->getMesh(0), hitboxLevel);
 	}
-	
-	bool intersect(const Ray &ray);
+
+	glm::vec3 intersect(const Ray& ray);
 	bool overlap(const Box &box);
 };
 

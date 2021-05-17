@@ -100,7 +100,7 @@ void EntityLander::update() {
 	min = MrotY * MrotX * MrotZ * glm::vec4(min, 1) + this->getPosition();
 	max = MrotY * MrotX * MrotZ * glm::vec4(max, 1) + this->getPosition();
 	hitbox = Box(glm::vec3(min.x, min.y, min.z), glm::vec3(max.x, max.y, max.z));
-	
+
 }
 
 
@@ -132,7 +132,7 @@ void EntityLander::loadVbo() {
 void EntityLander::draw() {
 	// Draw the lander.
 	EntityBase::draw(OF_MESH_FILL);
-	ofSetColor(255,255,255);
+	ofSetColor(255, 255, 255);
 	// Draw the particles
 //	this->mainThruster.draw();
 
@@ -151,14 +151,14 @@ void EntityLander::draw() {
 		ofEnablePointSprites();
 
 		// begin drawing in the camera
-		
+
 		//theCam->begin();
 		vbo.draw(GL_POINTS, 0, (int)mainThruster.sys->particles.size());
 
 		//  end drawing in the camera
 		//
 		//theCam->end();
-		
+
 
 		ofDisablePointSprites();
 		ofDisableBlendMode();
@@ -175,4 +175,8 @@ void EntityLander::draw() {
 	//Octree::drawBox(hitbox);
 }
 
-
+float EntityLander::getAltitude(Terrain& terrain) {
+	Ray ray = Ray(this->getPosition(), glm::vec3(0, 1, 0));
+	glm::vec3 intersectionPoint = terrain.intersect(ray);
+	return glm::length(intersectionPoint - this->getPosition());
+}
