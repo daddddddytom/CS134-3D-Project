@@ -5,8 +5,6 @@
 
 #include "EntityLander.h"
 
-#include "Octree.h"
-
 EntityLander::EntityLander(string fileName) {
 	this->loadModel(fileName);
 	this->setScaleNormalization(false);

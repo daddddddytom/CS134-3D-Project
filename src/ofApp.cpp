@@ -12,7 +12,7 @@ void ofApp::setup() {
 	lander.setPosition(200, 300, 200);
 
 	pathBox = Box(glm::vec3(0, 0, 0), glm::vec3(200, 300, 200));
-	
+
 
 #ifdef TARGET_OPENGLES
 	shader.load("shaders_gles/shader");
@@ -43,7 +43,7 @@ void ofApp::setup() {
 
 	theCam = &cam;
 
-	
+
 
 	ofEnableSmoothing();
 	ofEnableDepthTest();
@@ -82,8 +82,7 @@ void ofApp::update() {
 	if (inputHandler.getInputState(InputHandler::A)) {
 		//lander.addTorque(glm::vec3(0, 0, -0.1));
 		lander.rotateZACW = true;
-	}
-	else  {
+	} else {
 
 		lander.rotateZACW = false;
 		//cout << lander.rotateHeading << endl;
@@ -91,71 +90,62 @@ void ofApp::update() {
 	if (inputHandler.getInputState(InputHandler::D)) {
 		//lander.addTorque(glm::vec3(0, 0, -0.1));
 		lander.rotateZCW = true;
-	}
-	else {
+	} else {
 
 		lander.rotateZCW = false;
 		//cout << lander.rotateHeading << endl;
 	}
-	
+
 
 	if (inputHandler.getInputState(InputHandler::W)) {
 		//lander.addTorque(glm::vec3(0.1, 0, 0));
 		lander.rotateXACW = true;
-	}
-	else {
+	} else {
 		lander.rotateXACW = false;
 	}
 
 	if (inputHandler.getInputState(InputHandler::S)) {
 		//lander.addTorque(glm::vec3(-0.1, 0, 0));
 		lander.rotateXCW = true;
-	}
-	else {
+	} else {
 		lander.rotateXCW = false;
 	}
 
 	if (inputHandler.getInputState(InputHandler::Q)) {
 		//lander.addTorque(glm::vec3(0.1, 0, 0));
 		lander.rotateYACW = true;
-	}
-	else {
+	} else {
 		lander.rotateYACW = false;
 	}
 	if (inputHandler.getInputState(InputHandler::E)) {
 		//lander.addTorque(glm::vec3(0.1, 0, 0));
 		lander.rotateYCW = true;
-	}
-	else {
+	} else {
 		lander.rotateYCW = false;
 	}
 
 	if (inputHandler.getInputState(InputHandler::LEFT)) {
 		lander.XLthrusterOn = true;
-	}
-	else {
+	} else {
 		lander.XLthrusterOn = false;
 	}
 	if (inputHandler.getInputState(InputHandler::RIGHT)) {
 		lander.XRthrusterOn = true;
-	}
-	else {
+	} else {
 		lander.XRthrusterOn = false;
 	}
 	if (inputHandler.getInputState(InputHandler::UP)) {
 		lander.ZLthrusterOn = true;
-	}
-	else {
+	} else {
 		lander.ZLthrusterOn = false;
 	}
 	if (inputHandler.getInputState(InputHandler::DOWN)) {
 		lander.ZRthrusterOn = true;
-	}
-	else {
+	} else {
 		lander.ZRthrusterOn = false;
 	}
 
-
+	lander.addForce(glm::vec3(0, -7, 0));
 
 	//updating cameras
 	top.setPosition(lander.getPosition().x, lander.getPosition().y - 1, lander.getPosition().z);
@@ -207,18 +197,18 @@ void ofApp::draw() {
 	string str1 = "torqueZ: " + std::to_string(lander.torqueZ);
 	string str2 = "torqueX: " + std::to_string(lander.torqueX);
 	string str3 = "torqueY: " + std::to_string(lander.torqueY);
-	ofDrawBitmapString(str1, ofGetWindowWidth() -200, 15);
-	ofDrawBitmapString(str2, ofGetWindowWidth() -200, 30);
-	ofDrawBitmapString(str3, ofGetWindowWidth() -200, 45);
+	ofDrawBitmapString(str1, ofGetWindowWidth() - 200, 15);
+	ofDrawBitmapString(str2, ofGetWindowWidth() - 200, 30);
+	ofDrawBitmapString(str3, ofGetWindowWidth() - 200, 45);
 	glDepthMask(true);
 	ofSetColor(255, 255, 255);
-	
+
 	theCam->begin();
 	//cam.begin();
 
-	
-	
-	
+
+
+
 
 	ofPushMatrix();
 	drawPath(lander.getHitbox());
@@ -226,7 +216,7 @@ void ofApp::draw() {
 	ofEnableLighting();              // shaded mode
 	terrain.drawFaces();
 	ofMesh mesh;
-	
+
 	if (!bTerrainSelected) drawAxis(lander.getPosition());
 	if (bDisplayBBoxes) {
 		ofNoFill();
@@ -257,7 +247,7 @@ void ofApp::draw() {
 			Octree::drawBox(colBoxList[i]);
 		}
 	}
-	
+
 	if (bTerrainSelected) drawAxis(ofVec3f(0, 0, 0));
 
 	if (bDisplayOctree) {
@@ -279,7 +269,7 @@ void ofApp::draw() {
 	theCam->end();
 	shader.begin();
 	theCam->begin();
-	
+
 	theCam->end();
 	shader.end();
 }
@@ -363,7 +353,7 @@ void ofApp::keyPressed(int key) {
 		break;
 	case 'r':
 	case 'R':
-		
+
 		cam.reset();
 		cam.setPosition(0, 50, 0);
 		cam.setDistance(500);
@@ -487,12 +477,12 @@ void ofApp::keyReleased(int key) {
 		break;
 	case ' ':
 		inputHandler.setInputState(InputHandler::SPACE, false);
-		
+
 		break;
 	case 'a':
 	case 'A':
 		inputHandler.setInputState(InputHandler::A, false);
-		
+
 		break;
 	case 's':
 	case 'S':

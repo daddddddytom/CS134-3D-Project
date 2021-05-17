@@ -8,6 +8,7 @@
 #include "EntityBase.h"
 #include "ParticleEmitter.h"
 #include "ParticleSystem.h"
+#include "Terrain.h"
 
 class EntityLander : public EntityBase {
 protected:
