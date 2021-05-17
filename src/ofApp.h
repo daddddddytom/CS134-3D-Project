@@ -45,6 +45,7 @@ public:
 	ofEasyCam cam;
 	ofCamera top;
 	ofCamera *theCam;
+	ofCamera trackCam;
 
 	EntityLander lander = EntityLander("geo/landerTest1.obj");
 	Terrain terrain = Terrain("geo/terrain.obj", 7);

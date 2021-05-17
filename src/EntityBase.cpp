@@ -52,6 +52,7 @@ bool EntityBase::overlap(const Box& box) {
 void EntityBase::integrate() {
 	// delta time
 	float dt = 1.0f / (ofGetFrameRate() <= 1 ? 1 : ofGetFrameRate());
+	
 	// s(t) = vt
 	pos += velocity * dt;
 

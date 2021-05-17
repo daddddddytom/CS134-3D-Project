@@ -20,14 +20,27 @@ void ofApp::setup() {
 	bLanderLoaded = false;
 	bTerrainSelected = true;
 	//	ofSetWindowShape(1024, 768);
-	cam.setDistance(10);
+
+	//camera setup
+	cam.setPosition(0, 50, 0);
+	cam.setDistance(500);
 	cam.setNearClip(.1);
-	cam.setFov(65.5);   // approx equivalent to 28mm in 35mm format
+	cam.setFov(100);   // approx equivalent to 28mm in 35mm format
 	ofSetVerticalSync(true);
 	cam.disableMouseInput();
+	top.setNearClip(.1);
+	top.setFov(80);
+	trackCam.setPosition(200, 300, 500);
+	trackCam.setNearClip(.1);
+	trackCam.setFov(40);
+
+	theCam = &cam;
+
+
+
 	ofEnableSmoothing();
 	ofEnableDepthTest();
-	cam.setPosition(200, 400, 200);
+	//cam.setPosition(200, 400, 200);
 
 	// setup rudimentary lighting 
 	//
@@ -137,6 +150,16 @@ void ofApp::update() {
 
 
 
+	//updating cameras
+	top.setPosition(lander.getPosition().x, lander.getPosition().y - 1, lander.getPosition().z);
+	top.lookAt(glm::vec3(lander.getPosition().x, 0, lander.getPosition().z));
+	trackCam.lookAt(lander.getPosition());
+
+
+
+
+
+
 	collisionDetection();
 	lander.update();
 	land();
@@ -158,7 +181,9 @@ void ofApp::draw() {
 	ofDrawBitmapString(str3, ofGetWindowWidth() -200, 45);
 	glDepthMask(true);
 	ofSetColor(255, 255, 255);
-	cam.begin();
+
+	theCam->begin();
+	//cam.begin();
 	ofPushMatrix();
 	drawPath(lander.getHitbox());
 
@@ -214,7 +239,8 @@ void ofApp::draw() {
 
 
 	ofPopMatrix();
-	cam.end();
+	//cam.end();
+	theCam->end();
 }
 
 // 
@@ -295,7 +321,11 @@ void ofApp::keyPressed(int key) {
 	case 'h':
 		break;
 	case 'r':
+	case 'R':
+		
 		cam.reset();
+		cam.setPosition(0, 50, 0);
+		cam.setDistance(500);
 		break;
 	case 'O':
 	case 'o':
@@ -327,6 +357,9 @@ void ofApp::keyPressed(int key) {
 		break;
 	case OF_KEY_F2:
 		theCam = &top;
+		break;
+	case OF_KEY_F3:
+		theCam = &trackCam;
 		break;
 	case OF_KEY_UP:
 		inputHandler.setInputState(InputHandler::UP, true);
