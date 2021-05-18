@@ -29,7 +29,7 @@ void ofApp::setup() {
 	//	ofSetWindowShape(1024, 768);
 
 	//camera setup
-	cam.setPosition(0, 50, 0);
+	cam.setPosition(0, -50, 0);
 	cam.setDistance(500);
 	cam.setNearClip(.1);
 	cam.setFov(100);   // approx equivalent to 28mm in 35mm format
@@ -43,7 +43,8 @@ void ofApp::setup() {
 
 	theCam = &cam;
 
-
+	ofLight light;
+	ofLight keyLight, landerLight;
 
 	ofEnableSmoothing();
 	ofEnableDepthTest();
@@ -153,7 +154,7 @@ void ofApp::update() {
 	trackCam.lookAt(lander.getPosition());
 
 
-
+	cout <<lander.getAltitude(terrain)<<endl;
 
 
 

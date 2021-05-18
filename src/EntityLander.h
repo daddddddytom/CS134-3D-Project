@@ -9,6 +9,7 @@
 #include "ParticleEmitter.h"
 #include "ParticleSystem.h"
 #include "Terrain.h"
+#include "Octree.h"
 
 class EntityLander : public EntityBase {
 protected:

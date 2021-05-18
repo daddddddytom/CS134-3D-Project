@@ -48,7 +48,7 @@ public:
 	ofCamera trackCam;
 	ofShader shader;
 	EntityLander lander = EntityLander("geo/landerTest1.obj");
-	Terrain terrain = Terrain("geo/terrain.obj", 7);
+	Terrain terrain = Terrain("geo/terrain2.obj", 7);
 
 	ofLight light;
 

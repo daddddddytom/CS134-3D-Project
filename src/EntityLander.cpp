@@ -174,7 +174,7 @@ void EntityLander::draw() {
 }
 
 float EntityLander::getAltitude(Terrain& terrain) {
-	Ray ray = Ray(this->getPosition(), glm::vec3(0, 1, 0));
+	Ray ray = Ray(this->getPosition(), glm::vec3(0, -1, 0));
 	glm::vec3 intersectionPoint = terrain.intersect(ray);
-	return glm::length(intersectionPoint - this->getPosition());
+	return this->getPosition().y - intersectionPoint.y;
 }
