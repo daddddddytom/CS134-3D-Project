@@ -29,7 +29,8 @@ void ofApp::setup() {
 	//	ofSetWindowShape(1024, 768);
 
 	//camera setup
-	cam.setPosition(0, 300, 0);
+	cam.setPosition(0, 50, 0);
+	cam.rotate(-45, glm::vec3(1,0,0));
 	cam.setDistance(500);
 	cam.setNearClip(.1);
 	cam.setFov(100);   // approx equivalent to 28mm in 35mm format
@@ -356,6 +357,7 @@ void ofApp::keyPressed(int key) {
 	case 'R':
 
 		cam.reset();
+		cam.rotate(-45, glm::vec3(1, 0, 0));
 		cam.setPosition(0, 50, 0);
 		cam.setDistance(500);
 		break;
