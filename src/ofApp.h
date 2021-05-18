@@ -51,6 +51,7 @@ public:
 	Terrain terrain = Terrain("geo/terrain2.obj", 7);
 
 	ofLight light;
+	ofLight keyLight, landerLight, landerLight2, landerLight3;
 
 
 	vector<Box> colBoxList;

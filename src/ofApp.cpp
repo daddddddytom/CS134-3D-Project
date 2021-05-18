@@ -29,7 +29,7 @@ void ofApp::setup() {
 	//	ofSetWindowShape(1024, 768);
 
 	//camera setup
-	cam.setPosition(0, -50, 0);
+	cam.setPosition(0, 300, 0);
 	cam.setDistance(500);
 	cam.setNearClip(.1);
 	cam.setFov(100);   // approx equivalent to 28mm in 35mm format
@@ -72,7 +72,7 @@ void ofApp::update() {
 		cout << "Mission failed: Lander too far way from path" << endl;
 	}
 
-
+	landerLight.setPosition(lander.getPosition().x, lander.getPosition().y + 50, lander.getPosition().z);
 	// check input
 	if (inputHandler.getInputState(InputHandler::SPACE)) {
 		lander.thrusterOn = true;
@@ -146,7 +146,7 @@ void ofApp::update() {
 		lander.ZRthrusterOn = false;
 	}
 
-	lander.addForce(glm::vec3(0, -7, 0));
+	//lander.addForce(glm::vec3(0, -7, 0));
 
 	//updating cameras
 	top.setPosition(lander.getPosition().x, lander.getPosition().y - 1, lander.getPosition().z);
@@ -694,6 +694,54 @@ void ofApp::initLightingAndMaterials() {
 	glEnable(GL_LIGHT0);
 	//	glEnable(GL_LIGHT1);
 	glShadeModel(GL_SMOOTH);
+
+	ofVec3f pos = lander.getPosition();
+	keyLight.setup();
+	keyLight.enable();
+	keyLight.setAreaLight(2, 2);
+	keyLight.setAmbientColor(ofFloatColor(0.1, 0.1, 0.1));
+	keyLight.setDiffuseColor(ofFloatColor(0.9, 0.9, 0.9));
+	keyLight.setSpecularColor(ofFloatColor(1, 0, 0));
+	keyLight.rotate(180, ofVec3f(1, 0, 0));
+	keyLight.setPosition(0, 100, 0);
+
+	landerLight.setup();
+	landerLight.enable();
+	landerLight.setSpotlight();
+	landerLight.setScale(.1);
+	landerLight.setSpotlightCutOff(200);
+	landerLight.setAttenuation(2, .00001, .00001);
+	landerLight.setAmbientColor(ofFloatColor(0, 0, 0));
+	landerLight.setDiffuseColor(ofFloatColor(1, 1, 1));
+	landerLight.setSpecularColor(ofFloatColor(1, 1, 1));
+	landerLight.rotate(-90, ofVec3f(1, 0, 0));
+	landerLight.setPosition(pos.x, pos.y, pos.z);
+
+	landerLight2.setup();
+	landerLight2.enable();
+	landerLight2.setSpotlight();
+	landerLight2.setScale(.1);
+	landerLight2.setSpotlightCutOff(200);
+	landerLight2.setAttenuation(2, .00001, .00001);
+	landerLight2.setAmbientColor(ofFloatColor(0.1, 0, 0));
+	landerLight2.setDiffuseColor(ofFloatColor(0.9, 0.9, 0.9));
+	landerLight2.setSpecularColor(ofFloatColor(0.9, 0.9, 0.9));
+	landerLight2.rotate(45, ofVec3f(0, 0, 1));
+	landerLight2.setPosition(0, 100, 100);
+
+	landerLight3.setup();
+	landerLight3.enable();
+	landerLight3.setSpotlight();
+	landerLight3.setScale(.1);
+	landerLight3.setSpotlightCutOff(200);
+	landerLight3.setAttenuation(2, .00001, .00001);
+	landerLight3.setAmbientColor(ofFloatColor(0.1, 0, 0));
+	landerLight3.setDiffuseColor(ofFloatColor(0.9, 0.9, 0.9));
+	landerLight3.setSpecularColor(ofFloatColor(0.9, 0.9, 0.9));
+	landerLight3.rotate(-45, ofVec3f(0, 0, 1));
+	landerLight3.setPosition(0, 100, 0);
+
+
 }
 
 void ofApp::savePicture() {
