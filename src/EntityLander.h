@@ -28,7 +28,8 @@ protected:
 public:
 
 	// basic logic stuff
-	float fuel;
+	float fuel = 120.0;
+	float thrusterStartTime;
 	// thruster go brrrr
 	ParticleEmitter mainThruster;
 	ThrustForce thrustforce = ThrustForce(head() * -10);

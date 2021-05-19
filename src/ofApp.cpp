@@ -61,7 +61,14 @@ void ofApp::setup() {
 	gui.setup();
 	gui.add(numLevels.setup("Number of Octree Levels", 1, 1, 10));
 
-
+	plane.set(100000, 100000);   ///dimensions for width and height in pixels
+	plane.setPosition(0, -15, 0); /// position in x y z
+	plane.setResolution(2, 2);
+	plane.rotateDeg(83.5, 1, 0, 0);
+	plane.enableColors();
+	plane.enableTextures();
+	ofDisableArbTex();
+	ofLoadImage(texture, "geo/testmartialfloor.png");
 }
 
 //--------------------------------------------------------------
@@ -75,8 +82,12 @@ void ofApp::update() {
 
 	landerLight.setPosition(lander.getPosition().x, lander.getPosition().y + 50, lander.getPosition().z);
 	// check input
-	if (inputHandler.getInputState(InputHandler::SPACE)) {
+	if (inputHandler.getInputState(InputHandler::SPACE) && lander.get_fuel() > 0.0) {
 		lander.thrusterOn = true;
+		float time = ofGetElapsedTimeMillis();
+		cout << time - lander.mainThruster.lastSpawned << endl;
+		if ((time - lander.mainThruster.lastSpawned) >= 100)
+			lander.set_fuel(lander.get_fuel() - 0.1);
 	} else {
 		lander.thrusterOn = false;
 	}
@@ -155,7 +166,7 @@ void ofApp::update() {
 	trackCam.lookAt(lander.getPosition());
 
 
-	cout <<lander.getAltitude(terrain)<<endl;
+	//cout <<lander.getAltitude(terrain)<<endl;
 
 
 
@@ -172,36 +183,26 @@ void ofApp::update() {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 //--------------------------------------------------------------
 void ofApp::draw() {
 
 	ofBackground(ofColor::black);
+	ofImage temp;
+	temp.load("geo/starfield-8.png");		
+	ofPushMatrix();
+	ofDisableDepthTest();
+	ofSetColor(255, 255, 255);
+	ofScale(2, 2);
+	temp.draw(-200, -100);
+	ofEnableDepthTest();
+	ofPopMatrix();
 
 	glDepthMask(false);
 	gui.draw();
-	string str1 = "torqueZ: " + std::to_string(lander.torqueZ);
-	string str2 = "torqueX: " + std::to_string(lander.torqueX);
-	string str3 = "torqueY: " + std::to_string(lander.torqueY);
-	ofDrawBitmapString(str1, ofGetWindowWidth() - 200, 15);
-	ofDrawBitmapString(str2, ofGetWindowWidth() - 200, 30);
-	ofDrawBitmapString(str3, ofGetWindowWidth() - 200, 45);
+	string str4 = "Fuel remaining: " + std::to_string(lander.get_fuel());
+	string str5 = "Altitude (agl): " + std::to_string(lander.getAltitude(terrain));
+	ofDrawBitmapString(str5, ofGetWindowWidth() - 200, 15);
+	ofDrawBitmapString(str4, ofGetWindowWidth() - 200, 30);
 	glDepthMask(true);
 	ofSetColor(255, 255, 255);
 
@@ -217,6 +218,11 @@ void ofApp::draw() {
 
 	ofEnableLighting();              // shaded mode
 	terrain.drawFaces();
+	ofSetColor(110, 36, 3);
+	texture.bind();
+	plane.draw();
+	texture.unbind();
+	ofSetColor(255, 255, 255);
 	ofMesh mesh;
 
 	if (!bTerrainSelected) drawAxis(lander.getPosition());
@@ -409,7 +415,10 @@ void ofApp::keyPressed(int key) {
 		inputHandler.setInputState(InputHandler::RIGHT, true);
 		break;
 	case ' ':
-		inputHandler.setInputState(InputHandler::SPACE, true);
+		if (lander.get_fuel() > 0.0) {
+			inputHandler.setInputState(InputHandler::SPACE, true);
+			lander.thrusterStartTime = ofGetElapsedTimeMillis();
+		}
 		break;
 	case 'a':
 	case 'A':

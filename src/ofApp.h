@@ -49,6 +49,8 @@ public:
 	ofShader shader;
 	EntityLander lander = EntityLander("geo/landerTest1.obj");
 	Terrain terrain = Terrain("geo/terrain2.obj", 7);
+	ofPlanePrimitive plane;
+	ofTexture texture;
 
 	ofLight light;
 	ofLight keyLight, landerLight, landerLight2, landerLight3;
