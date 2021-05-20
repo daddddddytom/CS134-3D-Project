@@ -150,7 +150,7 @@ void ofApp::draw() {
 	switch (gameState) {
 	case MAIN_MENU:
 		// draw welcome message
-		ofDrawBitmapString("Press ENTER to start the simulation.", ofGetWindowWidth() / 2, ofGetWindowHeight() / 2);
+		ofDrawBitmapString("Press ENTER to start the simulation.", ofGetWindowWidth() / 2 - 125, ofGetWindowHeight() / 2);
 		break;
 	case IN_GAME:
 		ofPushMatrix();
