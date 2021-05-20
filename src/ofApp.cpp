@@ -65,13 +65,13 @@ void ofApp::setup() {
 	gui.add(numLevels.setup("Number of Octree Levels", 1, 1, 10));
 
 	plane.set(100000, 100000);   ///dimensions for width and height in pixels
-	plane.setPosition(0, -15, 0); /// position in x y z
+	plane.setPosition(0, Box::meshBounds(terrain.getMesh(0)).min().y, 0); /// position in x y z
 	plane.setResolution(2, 2);
 	plane.rotateDeg(90, 1, 0, 0);
 	plane.enableColors();
 	plane.enableTextures();
 	ofDisableArbTex();
-	ofLoadImage(texture, "geo/testmartialfloor.png");
+	ofLoadImage(texture, "geo/martianfloor.png");
 
 	gameState = MAIN_MENU;
 }
