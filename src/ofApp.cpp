@@ -74,6 +74,7 @@ void ofApp::setup() {
 	ofLoadImage(texture, "geo/martianfloor.png");
 
 	gameState = MAIN_MENU;
+	lander.set_velocity(glm::vec3(-120, 0, -60));
 }
 
 //--------------------------------------------------------------
@@ -82,7 +83,6 @@ void ofApp::setup() {
 void ofApp::update() {
 	switch (gameState) {
 	case MAIN_MENU:
-
 		break;
 	case IN_GAME:
 		checkDistToPath();
@@ -119,7 +119,7 @@ void ofApp::update() {
 		top.setPosition(lander.getPosition().x, lander.getPosition().y - 1, lander.getPosition().z);
 		top.lookAt(glm::vec3(lander.getPosition().x, 0, lander.getPosition().z));
 		trackCam.lookAt(lander.getPosition());
-		trackCam.setPosition(lander.getPosition().x -100, lander.getPosition().y + 100, lander.getPosition().z);
+		trackCam.setPosition(lander.getPosition().x - 100, lander.getPosition().y + 100, lander.getPosition().z);
 
 		// collision check
 		if ((terrain.overlap(lander.getHitbox()) || lander.getAltitude(terrain) < 0)) {
@@ -127,8 +127,7 @@ void ofApp::update() {
 				glm::vec3 normal = glm::vec3(0, 1, 0);
 				glm::vec3 impulseForce = (2) * (glm::dot(-lander.get_velocity(), normal) * normal);
 				lander.addForce(impulseForce);
-			}
-			else
+			} else
 				lander.explode();
 		} else {
 			lander.addForce(glm::vec3(0, -7, 0));
@@ -306,7 +305,7 @@ void ofApp::drawPath(Box landerBox) {
 	ofNoFill();
 
 
-	ofDrawBezier(0, 0, 0, 10, 450, 100, 200, 150, 100, 200, 300, 200);
+	ofDrawBezier(0, 0, 0, 10, 450, 100, 200, 250, 100, 200, 300, 200);
 
 
 	//ofDrawLine(ofPoint(400, 600, 0), ofPoint(landerBox.center().x, landerBox.center().y, landerBox.center().z));

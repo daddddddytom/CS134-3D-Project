@@ -29,7 +29,7 @@ EntityLander::EntityLander(string fileName) {
 void EntityLander::update() {
 	if (thrusterOn) {
 		mainThruster.setRate(10);
-		this->force += head() * 50;
+		this->force += head() * 30;
 	} else {
 		mainThruster.setRate(0);
 	}
@@ -47,27 +47,27 @@ void EntityLander::update() {
 
 		this->force -= back() * 10;
 	}
-	if (rotateZACW) {
-		torqueZ += 100;
-	} else if (rotateZCW) {
-		torqueZ -= 100;
-	} else if (!rotateZCW && !rotateZACW) {
-		torqueZ = 0.0f;
-	}
+
 	if (rotateXACW) {
 		torqueX += 100;
 	} else if (rotateXCW) {
 		torqueX -= 100;
 	} else if (!rotateXCW && !rotateXACW) {
-		torqueX = 0.0f;
+		torqueX = -rotationX / 2;
 	}
-
 	if (rotateYACW) {
 		torqueY += 100;
 	} else if (rotateYCW) {
 		torqueY -= 100;
 	} else if (!rotateYCW && !rotateYACW) {
-		torqueY = 0.0f;
+		torqueY = -rotationY / 2;
+	}
+	if (rotateZACW) {
+		torqueZ += 100;
+	} else if (rotateZCW) {
+		torqueZ -= 100;
+	} else if (!rotateZCW && !rotateZACW) {
+		torqueZ = -rotationZ / 2;
 	}
 
 	/*
@@ -202,7 +202,6 @@ bool EntityLander::isUpright(glm::vec3 head) {
 	ofVec3f upright = glm::vec3(0, 1, 0);
 	if (upright.angle(head) < 15.0) {
 		return true;
-	}
-	else
+	} else
 		return false;
 }
