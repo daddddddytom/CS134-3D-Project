@@ -29,7 +29,7 @@ EntityLander::EntityLander(string fileName) {
 void EntityLander::update() {
 	if (thrusterOn) {
 		mainThruster.setRate(10);
-		this->force += head() * 10;
+		this->force += head() * 50;
 	} else {
 		mainThruster.setRate(0);
 	}
@@ -192,4 +192,17 @@ float EntityLander::getAltitude(Terrain& terrain) {
 	Ray ray = Ray(this->getPosition(), glm::vec3(0, -0.1, 0));
 	glm::vec3 intersectionPoint = terrain.intersect(ray);
 	return this->getPosition().y - intersectionPoint.y;
+}
+
+void EntityLander::explode() {
+	cout << "I blew up" << endl;
+}
+
+bool EntityLander::isUpright(glm::vec3 head) {
+	ofVec3f upright = glm::vec3(0, 1, 0);
+	if (upright.angle(head) < 15.0) {
+		return true;
+	}
+	else
+		return false;
 }

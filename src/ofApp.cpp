@@ -32,7 +32,7 @@ void ofApp::setup() {
 	//	ofSetWindowShape(1024, 768);
 
 	//camera setup
-	cam.setPosition(0, 50, 0);
+	cam.setPosition(lander.getPosition().x, lander.getPosition().y - 50, lander.getPosition().z);
 	cam.rotate(-45, glm::vec3(1, 0, 0));
 	cam.setDistance(500);
 	cam.setNearClip(.1);
@@ -119,12 +119,17 @@ void ofApp::update() {
 		top.setPosition(lander.getPosition().x, lander.getPosition().y - 1, lander.getPosition().z);
 		top.lookAt(glm::vec3(lander.getPosition().x, 0, lander.getPosition().z));
 		trackCam.lookAt(lander.getPosition());
+		trackCam.setPosition(lander.getPosition().x -100, lander.getPosition().y + 100, lander.getPosition().z);
 
 		// collision check
-		if (terrain.overlap(lander.getHitbox()) || lander.getAltitude(terrain) < 0) {
-			glm::vec3 normal = glm::vec3(0, 1, 0);
-			glm::vec3 impulseForce = (2) * (glm::dot(-lander.get_velocity(), normal) * normal);
-			lander.addForce(impulseForce);
+		if ((terrain.overlap(lander.getHitbox()) || lander.getAltitude(terrain) < 0)) {
+			if (lander.isUpright(lander.head())) {
+				glm::vec3 normal = glm::vec3(0, 1, 0);
+				glm::vec3 impulseForce = (2) * (glm::dot(-lander.get_velocity(), normal) * normal);
+				lander.addForce(impulseForce);
+			}
+			else
+				lander.explode();
 		} else {
 			lander.addForce(glm::vec3(0, -7, 0));
 		}
@@ -156,12 +161,6 @@ void ofApp::draw() {
 		background.draw(-200, -100);
 		ofEnableDepthTest();
 		ofPopMatrix();
-
-		glDepthMask(false);
-		gui.draw();
-		ofDrawBitmapString("Altitude (agl): " + std::to_string(lander.getAltitude(terrain)), ofGetWindowWidth() - 200, 15);
-		ofDrawBitmapString("Fuel remaining: " + std::to_string(lander.get_fuel()), ofGetWindowWidth() - 200, 30);
-		glDepthMask(true);
 		ofSetColor(255, 255, 255);
 
 		theCam->begin();
@@ -238,6 +237,12 @@ void ofApp::draw() {
 
 		theCam->end();
 		shader.end();
+
+		glDepthMask(false);
+		gui.draw();
+		ofDrawBitmapString("Altitude (agl): " + std::to_string(lander.getAltitude(terrain)), ofGetWindowWidth() - 200, 15);
+		ofDrawBitmapString("Fuel remaining: " + std::to_string(lander.get_fuel()), ofGetWindowWidth() - 200, 30);
+		glDepthMask(true);
 		break;
 	case END_SCREEN:
 		// draw end screen stuff

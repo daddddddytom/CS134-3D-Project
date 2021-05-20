@@ -128,6 +128,9 @@ public:
 	}
 
 	float getAltitude(Terrain& terrain);
+
+	void explode();
+	bool isUpright(glm::vec3 head);
 };
 
 
