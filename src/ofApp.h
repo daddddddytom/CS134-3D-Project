@@ -44,15 +44,13 @@ public:
 	void drawBox(const Box &box);
 	Box meshBounds(const ofMesh &);
 
-	void collisionDetection();
-
 	ofEasyCam cam;
 	ofCamera top;
 	ofCamera *theCam;
 	ofCamera trackCam;
 	ofShader shader;
 	EntityLander lander = EntityLander("geo/landerTest1.obj");
-	Terrain terrain = Terrain("geo/terrain2.obj", 7);
+	Terrain terrain = Terrain("geo/terrain.obj", 10);
 	ofPlanePrimitive plane;
 	ofTexture texture;
 
@@ -80,7 +78,6 @@ public:
 
 	glm::vec3 mouseDownPos;
 
-	void land();
 	const float selectionRange = 4.0;
 
 	

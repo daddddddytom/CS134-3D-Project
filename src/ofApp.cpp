@@ -8,7 +8,7 @@
 //
 void ofApp::setup() {
 	ofBackground(ofColor::black);
-	
+
 	gravityForce = new GravityForce(ofVec3f(0, 10, 0));
 
 	lander.setPosition(200, 300, 200);
@@ -16,7 +16,7 @@ void ofApp::setup() {
 	pathBox = Box(glm::vec3(0, 0, 0), glm::vec3(200, 300, 200));
 
 	background.load("geo/starfield-8.png");
-	
+
 #ifdef TARGET_OPENGLES
 	shader.load("shaders_gles/shader");
 #else
@@ -33,7 +33,7 @@ void ofApp::setup() {
 
 	//camera setup
 	cam.setPosition(0, 50, 0);
-	cam.rotate(-45, glm::vec3(1,0,0));
+	cam.rotate(-45, glm::vec3(1, 0, 0));
 	cam.setDistance(500);
 	cam.setNearClip(.1);
 	cam.setFov(100);   // approx equivalent to 28mm in 35mm format
@@ -67,7 +67,7 @@ void ofApp::setup() {
 	plane.set(100000, 100000);   ///dimensions for width and height in pixels
 	plane.setPosition(0, -15, 0); /// position in x y z
 	plane.setResolution(2, 2);
-	plane.rotateDeg(83.5, 1, 0, 0);
+	plane.rotateDeg(90, 1, 0, 0);
 	plane.enableColors();
 	plane.enableTextures();
 	ofDisableArbTex();
@@ -80,11 +80,11 @@ void ofApp::setup() {
 // incrementally update scene (animation)
 //
 void ofApp::update() {
-	switch(gameState) {
-	case MAIN_MENU: 
-		
+	switch (gameState) {
+	case MAIN_MENU:
+
 		break;
-	case IN_GAME: 
+	case IN_GAME:
 		checkDistToPath();
 		if (bLanderOut) {
 			cout << "Mission failed: Lander too far way from path" << endl;
@@ -95,7 +95,7 @@ void ofApp::update() {
 		if (inputHandler.getInputState(InputHandler::SPACE) && lander.get_fuel() > 0.0) {
 			lander.thrusterOn = true;
 			float time = ofGetElapsedTimeMillis();
-			cout << time - lander.mainThruster.lastSpawned << endl;
+			//cout << time - lander.mainThruster.lastSpawned << endl;
 			if ((time - lander.mainThruster.lastSpawned) >= 100)
 				lander.set_fuel(lander.get_fuel() - 0.1);
 		} else {
@@ -113,22 +113,31 @@ void ofApp::update() {
 		lander.ZLthrusterOn = inputHandler.getInputState(InputHandler::UP);
 		lander.ZRthrusterOn = inputHandler.getInputState(InputHandler::DOWN);
 
-		//lander.addForce(glm::vec3(0, -7, 0));
+
 
 		//updating cameras
 		top.setPosition(lander.getPosition().x, lander.getPosition().y - 1, lander.getPosition().z);
 		top.lookAt(glm::vec3(lander.getPosition().x, 0, lander.getPosition().z));
 		trackCam.lookAt(lander.getPosition());
-		collisionDetection();
+
+		// collision check
+		if (terrain.overlap(lander.getHitbox()) || lander.getAltitude(terrain) < 0) {
+			glm::vec3 normal = glm::vec3(0, 1, 0);
+			glm::vec3 impulseForce = (2) * (glm::dot(-lander.get_velocity(), normal) * normal);
+			lander.addForce(impulseForce);
+		} else {
+			lander.addForce(glm::vec3(0, -7, 0));
+		}
+
 		lander.update();
-		land();
+
 		break;
-	case END_SCREEN: 
-		
+	case END_SCREEN:
+
 		break;
 	}
-	
-	
+
+
 }
 
 
@@ -139,7 +148,7 @@ void ofApp::draw() {
 		// draw welcome message
 		ofDrawBitmapString("Press ENTER to start the simulation.", ofGetWindowWidth() / 2, ofGetWindowHeight() / 2);
 		break;
-	case IN_GAME: 
+	case IN_GAME:
 		ofPushMatrix();
 		ofDisableDepthTest();
 		ofSetColor(255, 255, 255);
@@ -204,10 +213,17 @@ void ofApp::draw() {
 		if (bDisplayOctree) {
 			ofNoFill();
 			ofSetColor(ofColor::white);
-			terrain.octree.draw(numLevels, 0);
-		}
+			terrain.octree.drawLeafNodes();
 
+		}
 		lander.draw();
+		/*
+		terrain.octree.drawBox(lander.getHitbox());
+		ofSetColor(ofColor::blue);
+		ofDrawSphere(lander.getHitbox().min(), 0.5);
+		ofSetColor(ofColor::red);
+		ofDrawSphere(lander.getHitbox().max(), 0.5);
+		*/
 		// recursively draw octree
 		//
 		ofDisableLighting();
@@ -232,8 +248,8 @@ void ofApp::draw() {
 		ofDrawBitmapString("Score:", ofGetWindowWidth() / 2, ofGetWindowHeight() / 2 + 100);
 		break;
 	}
-			
-	
+
+
 }
 
 // 
@@ -612,23 +628,6 @@ void ofApp::gotMessage(ofMessage msg) {
 
 }
 
-
-//Collision Detection
-void ofApp::collisionDetection() {
-	if (terrain.overlap(lander.getHitbox())) {
-		bCollision = true;
-	} else {
-		bCollision = false;
-	}
-}
-
-void ofApp::land() {
-	if (bCollision) {
-		cout << "collision detected" << endl;
-		bCollision = false;
-	}
-
-}
 
 //--------------------------------------------------------------
 // setup basic ambient lighting in GL  (for now, enable just 1 light)

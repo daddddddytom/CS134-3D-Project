@@ -97,6 +97,21 @@ void EntityLander::update() {
 	glm::mat4 MrotY = glm::rotate(glm::mat4(1.0), glm::radians(rotationY), glm::vec3(0, 1, 0));
 	min = MrotY * MrotX * MrotZ * glm::vec4(min, 1) + this->getPosition();
 	max = MrotY * MrotX * MrotZ * glm::vec4(max, 1) + this->getPosition();
+	if (min.x > max.x) {
+		float temp = min.x;
+		min.x = max.x;
+		max.x = temp;
+	}
+	if (min.y > max.y) {
+		float temp = min.y;
+		min.y = max.y;
+		max.y = temp;
+	}
+	if (min.z > max.z) {
+		float temp = min.z;
+		min.z = max.z;
+		max.z = temp;
+	}
 	hitbox = Box(glm::vec3(min.x, min.y, min.z), glm::vec3(max.x, max.y, max.z));
 
 }
@@ -174,7 +189,7 @@ void EntityLander::draw() {
 }
 
 float EntityLander::getAltitude(Terrain& terrain) {
-	Ray ray = Ray(this->getPosition(), glm::vec3(0, -1, 0));
+	Ray ray = Ray(this->getPosition(), glm::vec3(0, -0.1, 0));
 	glm::vec3 intersectionPoint = terrain.intersect(ray);
 	return this->getPosition().y - intersectionPoint.y;
 }

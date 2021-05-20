@@ -10,14 +10,9 @@
 glm::vec3 Terrain::intersect(const Ray& ray) {
 	TreeNode dummyNode;
 	if (octree.intersect(ray, octree.root, dummyNode)) {
-
-		glm::vec3 rtnPoint = glm::vec3(dummyNode.box.center().x, dummyNode.box.max().y, dummyNode.box.center().z);
-		
-		return rtnPoint;
+		return glm::vec3(dummyNode.box.center().x, dummyNode.box.max().y, dummyNode.box.center().z);
 	}
-	else {
-		return glm::vec3(0, 0, 0);
-	}
+	return glm::vec3(0, -1000, 0);
 }
 
 bool Terrain::overlap(const Box& box) {

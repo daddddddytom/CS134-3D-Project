@@ -17,15 +17,12 @@ What ofxAssimpModelLoader doesn't have:
 class EntityBase : public ofxAssimpModelLoader {
 protected:
 	Box hitbox;
-	
+
 	glm::vec3 force = glm::vec3(0, 0, 0);
 	glm::vec3 velocity = glm::vec3(0, 0, 0);
 
 	glm::vec3 dTheta = glm::vec3(0, 0, 0);
 	glm::vec3 torque = glm::vec3(0, 0, 0);
-
-	
-	
 
 public:
 	EntityBase(string fileName);
@@ -45,7 +42,7 @@ public:
 	float torqueZ = 0.0;
 	float torqueY = 0.0;
 	float torqueX = 0.0;
-	
+
 
 	//copy ctor just in case
 	EntityBase(const EntityBase &original);
@@ -59,13 +56,21 @@ public:
 	Box getHitbox() {
 		return hitbox;
 	}
-	
+
 	// physics
 	virtual void integrate();
-	
+
+	glm::vec3 get_velocity() const {
+		return velocity;
+	}
+
+	void set_velocity(const glm::vec3& velocity) {
+		this->velocity = velocity;
+	}
+
 	void addForce(glm::vec3 quantity);
 	void addTorque(glm::vec3 quantity);
 
-	
+
 
 };
