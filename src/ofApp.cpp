@@ -7,13 +7,16 @@
 // setup scene, lighting, state and load geometry
 //
 void ofApp::setup() {
+	ofBackground(ofColor::black);
+	
 	gravityForce = new GravityForce(ofVec3f(0, 10, 0));
 
 	lander.setPosition(200, 300, 200);
 
 	pathBox = Box(glm::vec3(0, 0, 0), glm::vec3(200, 300, 200));
 
-
+	background.load("geo/starfield-8.png");
+	
 #ifdef TARGET_OPENGLES
 	shader.load("shaders_gles/shader");
 #else
@@ -69,217 +72,168 @@ void ofApp::setup() {
 	plane.enableTextures();
 	ofDisableArbTex();
 	ofLoadImage(texture, "geo/testmartialfloor.png");
+
+	gameState = MAIN_MENU;
 }
 
 //--------------------------------------------------------------
 // incrementally update scene (animation)
 //
 void ofApp::update() {
-	checkDistToPath();
-	if (bLanderOut) {
-		cout << "Mission failed: Lander too far way from path" << endl;
+	switch(gameState) {
+	case MAIN_MENU: 
+		
+		break;
+	case IN_GAME: 
+		checkDistToPath();
+		if (bLanderOut) {
+			cout << "Mission failed: Lander too far way from path" << endl;
+		}
+
+		landerLight.setPosition(lander.getPosition().x, lander.getPosition().y + 50, lander.getPosition().z);
+		// check input
+		if (inputHandler.getInputState(InputHandler::SPACE) && lander.get_fuel() > 0.0) {
+			lander.thrusterOn = true;
+			float time = ofGetElapsedTimeMillis();
+			cout << time - lander.mainThruster.lastSpawned << endl;
+			if ((time - lander.mainThruster.lastSpawned) >= 100)
+				lander.set_fuel(lander.get_fuel() - 0.1);
+		} else {
+			lander.thrusterOn = false;
+		}
+
+		lander.rotateZACW = inputHandler.getInputState(InputHandler::A);
+		lander.rotateZCW = inputHandler.getInputState(InputHandler::D);
+		lander.rotateXACW = inputHandler.getInputState(InputHandler::W);
+		lander.rotateXCW = inputHandler.getInputState(InputHandler::S);
+		lander.rotateYACW = inputHandler.getInputState(InputHandler::Q);
+		lander.rotateYCW = inputHandler.getInputState(InputHandler::E);
+		lander.XLthrusterOn = inputHandler.getInputState(InputHandler::LEFT);
+		lander.XRthrusterOn = inputHandler.getInputState(InputHandler::RIGHT);
+		lander.ZLthrusterOn = inputHandler.getInputState(InputHandler::UP);
+		lander.ZRthrusterOn = inputHandler.getInputState(InputHandler::DOWN);
+
+		//lander.addForce(glm::vec3(0, -7, 0));
+
+		//updating cameras
+		top.setPosition(lander.getPosition().x, lander.getPosition().y - 1, lander.getPosition().z);
+		top.lookAt(glm::vec3(lander.getPosition().x, 0, lander.getPosition().z));
+		trackCam.lookAt(lander.getPosition());
+		collisionDetection();
+		lander.update();
+		land();
+		break;
+	case END_SCREEN: 
+		
+		break;
 	}
-
-	landerLight.setPosition(lander.getPosition().x, lander.getPosition().y + 50, lander.getPosition().z);
-	// check input
-	if (inputHandler.getInputState(InputHandler::SPACE) && lander.get_fuel() > 0.0) {
-		lander.thrusterOn = true;
-		float time = ofGetElapsedTimeMillis();
-		cout << time - lander.mainThruster.lastSpawned << endl;
-		if ((time - lander.mainThruster.lastSpawned) >= 100)
-			lander.set_fuel(lander.get_fuel() - 0.1);
-	} else {
-		lander.thrusterOn = false;
-	}
-
-	if (inputHandler.getInputState(InputHandler::A)) {
-		//lander.addTorque(glm::vec3(0, 0, -0.1));
-		lander.rotateZACW = true;
-	} else {
-
-		lander.rotateZACW = false;
-		//cout << lander.rotateHeading << endl;
-	}
-	if (inputHandler.getInputState(InputHandler::D)) {
-		//lander.addTorque(glm::vec3(0, 0, -0.1));
-		lander.rotateZCW = true;
-	} else {
-
-		lander.rotateZCW = false;
-		//cout << lander.rotateHeading << endl;
-	}
-
-
-	if (inputHandler.getInputState(InputHandler::W)) {
-		//lander.addTorque(glm::vec3(0.1, 0, 0));
-		lander.rotateXACW = true;
-	} else {
-		lander.rotateXACW = false;
-	}
-
-	if (inputHandler.getInputState(InputHandler::S)) {
-		//lander.addTorque(glm::vec3(-0.1, 0, 0));
-		lander.rotateXCW = true;
-	} else {
-		lander.rotateXCW = false;
-	}
-
-	if (inputHandler.getInputState(InputHandler::Q)) {
-		//lander.addTorque(glm::vec3(0.1, 0, 0));
-		lander.rotateYACW = true;
-	} else {
-		lander.rotateYACW = false;
-	}
-	if (inputHandler.getInputState(InputHandler::E)) {
-		//lander.addTorque(glm::vec3(0.1, 0, 0));
-		lander.rotateYCW = true;
-	} else {
-		lander.rotateYCW = false;
-	}
-
-	if (inputHandler.getInputState(InputHandler::LEFT)) {
-		lander.XLthrusterOn = true;
-	} else {
-		lander.XLthrusterOn = false;
-	}
-	if (inputHandler.getInputState(InputHandler::RIGHT)) {
-		lander.XRthrusterOn = true;
-	} else {
-		lander.XRthrusterOn = false;
-	}
-	if (inputHandler.getInputState(InputHandler::UP)) {
-		lander.ZLthrusterOn = true;
-	} else {
-		lander.ZLthrusterOn = false;
-	}
-	if (inputHandler.getInputState(InputHandler::DOWN)) {
-		lander.ZRthrusterOn = true;
-	} else {
-		lander.ZRthrusterOn = false;
-	}
-
-	//lander.addForce(glm::vec3(0, -7, 0));
-
-	//updating cameras
-	top.setPosition(lander.getPosition().x, lander.getPosition().y - 1, lander.getPosition().z);
-	top.lookAt(glm::vec3(lander.getPosition().x, 0, lander.getPosition().z));
-	trackCam.lookAt(lander.getPosition());
-
-
-	//cout <<lander.getAltitude(terrain)<<endl;
-
-
-
-	collisionDetection();
-	lander.update();
-	land();
-
-
-
-
-
-
-
+	
+	
 }
 
 
 //--------------------------------------------------------------
 void ofApp::draw() {
+	switch (gameState) {
+	case MAIN_MENU:
+		// draw welcome message
+		ofDrawBitmapString("Press ENTER to start the simulation.", ofGetWindowWidth() / 2, ofGetWindowHeight() / 2);
+		break;
+	case IN_GAME: 
+		ofPushMatrix();
+		ofDisableDepthTest();
+		ofSetColor(255, 255, 255);
+		ofScale(2, 2);
+		background.draw(-200, -100);
+		ofEnableDepthTest();
+		ofPopMatrix();
 
-	ofBackground(ofColor::black);
-	ofImage temp;
-	temp.load("geo/starfield-8.png");		
-	ofPushMatrix();
-	ofDisableDepthTest();
-	ofSetColor(255, 255, 255);
-	ofScale(2, 2);
-	temp.draw(-200, -100);
-	ofEnableDepthTest();
-	ofPopMatrix();
+		glDepthMask(false);
+		gui.draw();
+		ofDrawBitmapString("Altitude (agl): " + std::to_string(lander.getAltitude(terrain)), ofGetWindowWidth() - 200, 15);
+		ofDrawBitmapString("Fuel remaining: " + std::to_string(lander.get_fuel()), ofGetWindowWidth() - 200, 30);
+		glDepthMask(true);
+		ofSetColor(255, 255, 255);
 
-	glDepthMask(false);
-	gui.draw();
-	string str4 = "Fuel remaining: " + std::to_string(lander.get_fuel());
-	string str5 = "Altitude (agl): " + std::to_string(lander.getAltitude(terrain));
-	ofDrawBitmapString(str5, ofGetWindowWidth() - 200, 15);
-	ofDrawBitmapString(str4, ofGetWindowWidth() - 200, 30);
-	glDepthMask(true);
-	ofSetColor(255, 255, 255);
+		theCam->begin();
 
-	theCam->begin();
-	//cam.begin();
+		ofPushMatrix();
+		drawPath(lander.getHitbox());
 
+		ofEnableLighting();              // shaded mode
+		terrain.drawFaces();
+		ofSetColor(110, 36, 3);
+		texture.bind();
+		plane.draw();
+		texture.unbind();
+		ofSetColor(255, 255, 255);
 
-
-
-
-	ofPushMatrix();
-	drawPath(lander.getHitbox());
-
-	ofEnableLighting();              // shaded mode
-	terrain.drawFaces();
-	ofSetColor(110, 36, 3);
-	texture.bind();
-	plane.draw();
-	texture.unbind();
-	ofSetColor(255, 255, 255);
-	ofMesh mesh;
-
-	if (!bTerrainSelected) drawAxis(lander.getPosition());
-	if (bDisplayBBoxes) {
-		ofNoFill();
-		ofSetColor(ofColor::white);
-		for (int i = 0; i < lander.getNumMeshes(); i++) {
-			ofPushMatrix();
-			ofMultMatrix(lander.getModelMatrix());
-			ofRotate(-90, 1, 0, 0);
-			Octree::drawBox(bboxList[i]);
-			ofPopMatrix();
+		if (!bTerrainSelected) drawAxis(lander.getPosition());
+		if (bDisplayBBoxes) {
+			ofNoFill();
+			ofSetColor(ofColor::white);
+			for (int i = 0; i < lander.getNumMeshes(); i++) {
+				ofPushMatrix();
+				ofMultMatrix(lander.getModelMatrix());
+				ofRotate(-90, 1, 0, 0);
+				Octree::drawBox(bboxList[i]);
+				ofPopMatrix();
+			}
 		}
-	}
 
-	if (bLanderSelected) {
+		if (bLanderSelected) {
 
-		ofVec3f min = lander.getSceneMin() + lander.getPosition();
-		ofVec3f max = lander.getSceneMax() + lander.getPosition();
+			ofVec3f min = lander.getSceneMin() + lander.getPosition();
+			ofVec3f max = lander.getSceneMax() + lander.getPosition();
 
-		Box bounds = Box(glm::vec3(min.x, min.y, min.z), glm::vec3(max.x, max.y, max.z));
-		ofNoFill();
-		//ofSetColor(ofColor::white);
-		Octree::drawBox(bounds);
+			Box bounds = Box(glm::vec3(min.x, min.y, min.z), glm::vec3(max.x, max.y, max.z));
+			ofNoFill();
+			//ofSetColor(ofColor::white);
+			Octree::drawBox(bounds);
 
-		// draw colliding boxes
+			// draw colliding boxes
+			//
+			ofSetColor(ofColor::red);
+			for (int i = 0; i < colBoxList.size(); i++) {
+				Octree::drawBox(colBoxList[i]);
+			}
+		}
+
+		if (bTerrainSelected) drawAxis(ofVec3f(0, 0, 0));
+
+		if (bDisplayOctree) {
+			ofNoFill();
+			ofSetColor(ofColor::white);
+			terrain.octree.draw(numLevels, 0);
+		}
+
+		lander.draw();
+		// recursively draw octree
 		//
-		ofSetColor(ofColor::red);
-		for (int i = 0; i < colBoxList.size(); i++) {
-			Octree::drawBox(colBoxList[i]);
-		}
+		ofDisableLighting();
+		//	ofNoFill();
+
+
+		ofPopMatrix();
+		//cam.end();
+		theCam->end();
+		shader.begin();
+		theCam->begin();
+
+		theCam->end();
+		shader.end();
+		break;
+	case END_SCREEN:
+		// draw end screen stuff
+		// draw end game message
+		//TODO: DRAW BASED ON RESULT
+		ofDrawBitmapString("Simulation over.", ofGetWindowWidth() / 2, ofGetWindowHeight() / 2);
+		// draw score
+		ofDrawBitmapString("Score:", ofGetWindowWidth() / 2, ofGetWindowHeight() / 2 + 100);
+		break;
 	}
-
-	if (bTerrainSelected) drawAxis(ofVec3f(0, 0, 0));
-
-	if (bDisplayOctree) {
-		ofNoFill();
-		ofSetColor(ofColor::white);
-		terrain.octree.draw(numLevels, 0);
-	}
-
-	lander.draw();
-	// recursively draw octree
-	//
-	ofDisableLighting();
-	int level = 0;
-	//	ofNoFill();
-
-
-	ofPopMatrix();
-	//cam.end();
-	theCam->end();
-	shader.begin();
-	theCam->begin();
-
-	theCam->end();
-	shader.end();
+			
+	
 }
 
 // 
@@ -413,6 +367,13 @@ void ofApp::keyPressed(int key) {
 
 	case OF_KEY_RIGHT:
 		inputHandler.setInputState(InputHandler::RIGHT, true);
+		break;
+	case OF_KEY_RETURN:
+		if (gameState == MAIN_MENU) {
+			gameState = IN_GAME;
+		} else if (gameState == END_SCREEN) {
+			gameState = MAIN_MENU;
+		}
 		break;
 	case ' ':
 		if (lander.get_fuel() > 0.0) {

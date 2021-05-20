@@ -13,6 +13,10 @@
 class ofApp : public ofBaseApp {
 
 public:
+
+	enum GameState { MAIN_MENU, IN_GAME, END_SCREEN };
+	GameState gameState;
+	
 	void setup();
 	void update();
 	void draw();
@@ -99,5 +103,7 @@ public:
 	ThrustForce* engineForce;
 
 	InputHandler inputHandler;
+
+	ofImage background;
 
 };
