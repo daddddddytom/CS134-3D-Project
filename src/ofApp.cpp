@@ -336,7 +336,7 @@ void ofApp::draw() {
 			ofDrawBitmapString("Simulation over.", ofGetWindowWidth() / 2 - 75, ofGetWindowHeight() / 2);
 			// draw score
 			ofDrawBitmapString("Score: " + to_string(score), ofGetWindowWidth() / 2 - 50, ofGetWindowHeight() / 2 + 25);
-			if (score < 2) {
+			if (score < 0) {
 				ofDrawBitmapString("Landing Failed.", ofGetWindowWidth() / 2 - 75, ofGetWindowHeight() / 2 + 50);
 			} else {
 				ofDrawBitmapString("Landing Successful.", ofGetWindowWidth() / 2 - 75, ofGetWindowHeight() / 2 + 50);
