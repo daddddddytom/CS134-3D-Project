@@ -8,6 +8,9 @@
 //
 void ofApp::setup() {
 	ofBackground(ofColor::black);
+	
+	pathPoints = { glm::vec3(0, 0, 0), glm::vec3(0, 10, 0), glm::vec3(10, 50, 10), glm::vec3(20, 100, 20), glm::vec3(40, 200, 40), glm::vec3(80, 250, 80),
+		glm::vec3(160, 270, 160), glm::vec3(180, 290, 180), glm::vec3(200, 300, 200) };
 
 	gravityForce = new GravityForce(ofVec3f(0, 10, 0));
 
@@ -119,12 +122,6 @@ void ofApp::update() {
 	case MAIN_MENU:
 		break;
 	case IN_GAME:
-		
-		checkDistToPath();
-		if (bLanderOut) {
-			cout << "Warning: Lander too far way from path" << endl;
-		}
-
 		landerLight.setPosition(lander.getPosition().x, lander.getPosition().y + 50, lander.getPosition().z);
 
 		// check input
@@ -210,7 +207,6 @@ void ofApp::draw() {
 		theCam->begin();
 		//explosion.draw();
 		ofPushMatrix();
-		drawPath(lander.getHitbox());
 
 		ofEnableLighting();              // shaded mode
 		terrain.drawFaces();
@@ -309,23 +305,37 @@ void ofApp::draw() {
 			glDepthMask(GL_TRUE);
 		}
 
+
+		float minDistance = glm::length(pathPoints[pathPoints.size() - 1] - lander.getPosition());
+		for (int i = 0; i < pathPoints.size() - 1; i++) {
+			float dis = glm::length(pathPoints[i] - lander.getPosition());
+			ofDrawLine(pathPoints[i], pathPoints[i + 1]);
+			if (dis < minDistance) {
+				minDistance = dis;
+			}
+		}
+		
 		ofPopMatrix();
 		//cam.end();
 		theCam->end();
-
-
-
 		glDepthMask(false);
 		//gui.draw();
 		if (gameState == IN_GAME) {
 			ofDrawBitmapString("Altitude (agl): " + std::to_string(lander.getAltitude(terrain)), ofGetWindowWidth() - 200, 15);
 			ofDrawBitmapString("Fuel remaining: " + std::to_string(lander.get_fuel()), ofGetWindowWidth() - 200, 30);
 			ofDrawBitmapString("Speed: " + std::to_string(glm::length(lander.get_velocity())), ofGetWindowWidth() - 200, 45);
+			ofDrawBitmapString("Distance from path: " + std::to_string(minDistance), ofGetWindowWidth() - 200, 60);
 		} else {
 			// draw end screen stuff
 			ofDrawBitmapString("Simulation over.", ofGetWindowWidth() / 2 - 75, ofGetWindowHeight() / 2);
 			// draw score
 			ofDrawBitmapString("Score: " + to_string(score), ofGetWindowWidth() / 2 - 50, ofGetWindowHeight() / 2 + 25);
+			if (score < 2) {
+				ofDrawBitmapString("Landing Failed." + to_string(score), ofGetWindowWidth() / 2 - 75, ofGetWindowHeight() / 2 + 50);
+				ofDrawBitmapString("Mars Lander Damaged." + to_string(score), ofGetWindowWidth() / 2 - 75, ofGetWindowHeight() / 2 + 75);
+			} else {
+				ofDrawBitmapString("Landing Successful." + to_string(score), ofGetWindowWidth() / 2 - 75, ofGetWindowHeight() / 2 + 50);
+			}
 		}
 		glDepthMask(true);
 		break;
@@ -389,28 +399,6 @@ void ofApp::checkDistToPath() {
 		bLanderOut = false;
 	}
 }
-
-
-
-
-void ofApp::drawPath(Box landerBox) {
-	ofPushMatrix();
-
-	//ofSetColor(0x000000);
-	ofNoFill();
-
-
-	ofDrawBezier(0, 0, 0, 10, 450, 100, 200, 250, 100, 200, 300, 200);
-
-
-	//ofDrawLine(ofPoint(400, 600, 0), ofPoint(landerBox.center().x, landerBox.center().y, landerBox.center().z));
-
-
-
-
-	ofPopMatrix();
-}
-
 
 
 void ofApp::keyPressed(int key) {
@@ -863,5 +851,4 @@ bool ofApp::mouseIntersectPlane(glm::vec3 planePoint, glm::vec3 planeNorm, glm::
 	rayDir.normalize();
 	return (rayIntersectPlane(rayPoint, rayDir, planePoint, planeNorm, point));
 }
-
 

@@ -98,7 +98,6 @@ public:
 	ofxPanel gui;
 	//const float selectionRange = 4.0;
 
-	void drawPath(Box landerBox);
 
 	TurbulenceForce* turbForce;
 	GravityForce* gravityForce;
@@ -112,6 +111,8 @@ public:
 
 	ofImage background;
 	ofTexture  particleTex;
+
+	vector<glm::vec3> pathPoints;
 
 	int score = 0;
 };
