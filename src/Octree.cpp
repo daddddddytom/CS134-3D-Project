@@ -9,7 +9,14 @@
 //  Copying or use without permission is prohibited by law. 
 //
 
-
+/*
+ *	CS 134 Final Project
+ *  Team: Hugo Wong, Hanqi Dai (Tom), Tomer Erlich
+ *
+ *	Base code given by Prof. Smith
+ *	
+ *  Octree.cpp
+ */
 #include "Octree.h"
 
 //draw a box from a "Box" class  

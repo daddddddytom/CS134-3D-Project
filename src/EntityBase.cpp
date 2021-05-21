@@ -1,5 +1,12 @@
 #include "EntityBase.h"
 
+
+/*
+ *	CS 134 Final Project
+ *  Team: Hugo Wong, Hanqi Dai (Tom), Tomer Erlich
+ *
+ *  EntityBase.cpp
+ */
 EntityBase::EntityBase(string fileName) {
 	if (!this->loadModel(fileName, true)) {
 		cout << "cannot load " << fileName << endl;

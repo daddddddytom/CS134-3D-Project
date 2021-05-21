@@ -1,8 +1,9 @@
-//
-//  EntityLander.h
-//  CS134-3D-Project
-//
-
+/*
+ *	CS 134 Final Project
+ *  Team: Hugo Wong, Hanqi Dai (Tom), Tomer Erlich
+ *
+ *  EntityBase.h
+ */
 #ifndef EntityLander_h
 #define EntityLander_h
 #include "EntityBase.h"

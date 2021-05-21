@@ -1,9 +1,12 @@
-//
-//  EntityLander.cpp
-//  CS134-3D-Project
-//
+/*
+ *	CS 134 Final Project
+ *  Team: Hugo Wong, Hanqi Dai (Tom), Tomer Erlich
+ *
+ *  EntityLander.cpp
+ */
 
 #include "EntityLander.h"
+
 
 EntityLander::EntityLander(string fileName) {
 	this->loadModel(fileName);

@@ -10,6 +10,13 @@
  *
  */
 
+ /*
+  *	CS 134 Final Project
+  *  Team: Hugo Wong, Hanqi Dai (Tom), Tomer Erlich
+  *
+  *  Box.cpp
+  */
+
 bool Box::intersect(const Ray &r, float t0, float t1) const {
 	float tmin, tmax, tymin, tymax, tzmin, tzmax;
 

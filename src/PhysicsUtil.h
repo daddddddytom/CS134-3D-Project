@@ -3,6 +3,14 @@
 #include "ofMain.h"
 #include "EntityBase.h"
 
+/*
+ *	CS 134 Final Project
+ *  Team: Hugo Wong, Hanqi Dai (Tom), Tomer Erlich
+ *
+ *  PhysicsUtil.h
+ *
+ *  Base code given by Prof. Smith.
+ */
 class Force {
 protected:
 public:

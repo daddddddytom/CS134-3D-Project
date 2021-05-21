@@ -3,6 +3,12 @@
 /*
  A class for handling multiple user inputs.
 */
+/*
+ *	CS 134 Final Project
+ *  Team: Hugo Wong, Hanqi Dai (Tom), Tomer Erlich
+ *
+ *  InputHandler.h
+ */
 class InputHandler {
 private:
 	bool inputStates[9] = { false, false, false, false, false, false, false, false, false};

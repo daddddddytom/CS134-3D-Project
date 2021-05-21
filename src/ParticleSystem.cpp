@@ -1,6 +1,11 @@
-
-// Kevin M.Smith - CS 134 SJSU
-
+/*
+ *	CS 134 Final Project
+ *  Team: Hugo Wong, Hanqi Dai (Tom), Tomer Erlich
+ *
+ *  ParticleSystem.cpp
+ *
+ *  Base code given by Prof. Smith
+ */
 #include "ParticleSystem.h"
 
 void ParticleSystem::add(const Particle &p) {

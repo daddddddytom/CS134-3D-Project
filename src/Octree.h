@@ -8,13 +8,21 @@
 //  Copyright (c) by Kevin M. Smith
 //  Copying or use without permission is prohibited by law.
 //
+
 #pragma once
 #include "ofMain.h"
 #include "box.h"
 #include "ray.h"
 
 
-
+/*
+ *	CS 134 Final Project
+ *  Team: Hugo Wong, Hanqi Dai (Tom), Tomer Erlich
+ *
+ *	Base code given by Prof. Smith
+ *	
+ *  TreeNode.h
+ */
 class TreeNode {
 public:
 	Box box;

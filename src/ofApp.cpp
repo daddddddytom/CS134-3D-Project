@@ -3,9 +3,12 @@
 #include "Octree.h"
 #include <glm/gtx/intersect.hpp>
 
-//--------------------------------------------------------------
-// setup scene, lighting, state and load geometry
-//
+/*
+ *	CS 134 Final Project
+ *  Team: Hugo Wong, Hanqi Dai (Tom), Tomer Erlich
+ *
+ *  ofApp.cpp
+ */
 void ofApp::setup() {
 	ofBackground(ofColor::black);
 

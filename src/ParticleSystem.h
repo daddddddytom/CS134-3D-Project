@@ -1,6 +1,12 @@
 #pragma once
-//  Kevin M. Smith - CS 134 SJSU
-
+/*
+ *	CS 134 Final Project
+ *  Team: Hugo Wong, Hanqi Dai (Tom), Tomer Erlich
+ *
+ *  ParticleSystem.h
+ *
+ *  Base code given by Prof. Smith
+ */
 #include "ofMain.h"
 #include "Particle.h"
 

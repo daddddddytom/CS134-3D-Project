@@ -11,6 +11,12 @@
 #include "ofxGui.h"
 #include "Terrain.h"
 
+/*
+ *	CS 134 Final Project
+ *  Team: Hugo Wong, Hanqi Dai (Tom), Tomer Erlich
+ *  
+ *  ofApp.h
+ */
 class ofApp : public ofBaseApp {
 
 public:

@@ -15,6 +15,12 @@
  *
  */
 
+ /*
+  *	CS 134 Final Project
+  *  Team: Hugo Wong, Hanqi Dai (Tom), Tomer Erlich
+  *
+  *  Box.h
+  */
 class Box {
 public:
 	Box() {}

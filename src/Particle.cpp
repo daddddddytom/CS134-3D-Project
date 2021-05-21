@@ -1,6 +1,13 @@
 #include "Particle.h"
 
-
+/*
+ *	CS 134 Final Project
+ *  Team: Hugo Wong, Hanqi Dai (Tom), Tomer Erlich
+ *
+ *  Particles.cpp
+ *
+ *  Base code given by Prof. Smith
+ */
 Particle::Particle() {
 
 	// initialize particle with some reasonable values first;

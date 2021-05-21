@@ -1,12 +1,11 @@
-//
-//  Terrain.cpp
-//  CS134-3D-Project
-//
-//
-
 #include "Terrain.h"
 
-
+/*
+  *	CS 134 Final Project
+  *  Team: Hugo Wong, Hanqi Dai (Tom), Tomer Erlich
+  *
+  *  Terrain.cpp
+  */
 glm::vec3 Terrain::intersect(const Ray& ray) {
 	TreeNode dummyNode;
 	if (octree.intersect(ray, octree.root, dummyNode)) {

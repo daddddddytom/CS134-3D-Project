@@ -12,7 +12,6 @@
  *      Journal of graphics tools, 10(1):49-54, 2005
  *
  */
-
 class Ray {
 public:
 	Ray() {}

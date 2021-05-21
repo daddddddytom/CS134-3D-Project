@@ -5,6 +5,13 @@
 #include "Box.h"
 
 /*
+ *	CS 134 Final Project
+ *  Team: Hugo Wong, Hanqi Dai (Tom), Tomer Erlich
+ *
+ *  EntityBase.h
+ */
+
+/*
 What ofxAssimpModelLoader has:
 - position, rotation, scale
 - wireframe drawing, face drawing, axis drawing

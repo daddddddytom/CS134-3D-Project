@@ -1,6 +1,11 @@
-
-//  Kevin M. Smith - CS 134 SJSU
-
+/*
+ *	CS 134 Final Project
+ *  Team: Hugo Wong, Hanqi Dai (Tom), Tomer Erlich
+ *
+ *  ParticleEmitter.cpp
+ *
+ *  Base code given by Prof. Smith
+ */
 #include "ParticleEmitter.h"
 
 ParticleEmitter::ParticleEmitter() {

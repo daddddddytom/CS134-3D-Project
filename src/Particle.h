@@ -2,6 +2,14 @@
 
 #include "ofMain.h"
 
+/*
+ *	CS 134 Final Project
+ *  Team: Hugo Wong, Hanqi Dai (Tom), Tomer Erlich
+ *
+ *  Particles.h
+ *
+ *  Base code given by Prof. Smith
+ */
 class ParticleForceField;
 
 class Particle {

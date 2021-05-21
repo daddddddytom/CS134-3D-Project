@@ -1,6 +1,12 @@
 #pragma once
-//  Kevin M. Smith - CS 134 SJSU
-
+/*
+ *	CS 134 Final Project
+ *  Team: Hugo Wong, Hanqi Dai (Tom), Tomer Erlich
+ *
+ *  ParticleEmitter.h
+ *
+ *  Base code given by Prof. Smith
+ */
 #include "TransformObject.h"
 #include "ParticleSystem.h"
 
