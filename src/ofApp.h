@@ -45,6 +45,8 @@ public:
 	void drawBox(const Box &box);
 	Box meshBounds(const ofMesh &);
 
+	void initGame();
+	
 	ofEasyCam cam;
 	ofCamera top;
 	ofCamera *theCam;
@@ -110,4 +112,6 @@ public:
 
 	ofImage background;
 	ofTexture  particleTex;
+
+	int score = 0;
 };

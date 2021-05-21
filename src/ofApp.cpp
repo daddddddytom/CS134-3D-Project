@@ -11,8 +11,6 @@ void ofApp::setup() {
 
 	gravityForce = new GravityForce(ofVec3f(0, 10, 0));
 
-	lander.setPosition(200, 300, 200);
-
 	pathBox = Box(glm::vec3(0, 0, 0), glm::vec3(200, 300, 200));
 
 	background.load("geo/starfield-8.png");
@@ -41,7 +39,6 @@ void ofApp::setup() {
 	cam.setDistance(500);
 	cam.setNearClip(.1);
 	cam.setFov(100);   // approx equivalent to 28mm in 35mm format
-	ofSetVerticalSync(true);
 	cam.disableMouseInput();
 	top.setNearClip(.1);
 	top.setFov(80);
@@ -62,12 +59,6 @@ void ofApp::setup() {
 	//
 	initLightingAndMaterials();
 
-
-	// create sliders for testing
-	//
-	gui.setup();
-	gui.add(numLevels.setup("Number of Octree Levels", 1, 1, 10));
-
 	plane.set(100000, 100000);   ///dimensions for width and height in pixels
 	plane.setPosition(0, Box::meshBounds(terrain.getMesh(0)).min().y, 0); /// position in x y z
 	plane.setResolution(2, 2);
@@ -78,7 +69,6 @@ void ofApp::setup() {
 	ofLoadImage(texture, "geo/martianfloor.png");
 
 	gameState = MAIN_MENU;
-	//lander.set_velocity(glm::vec3(-120, 0, -60));
 
 	explosion = new ParticleEmitter();
 	turbulanceForce = new TurbulenceForce(ofVec3f(-20, -20, 0), ofVec3f(20, 20, 0));
@@ -94,9 +84,31 @@ void ofApp::setup() {
 	explosion->setParticleRadius(1);
 	explosion->setLifespan(1);
 
+}
 
-
-
+void ofApp::initGame() {
+	cam.setPosition(lander.getPosition().x, lander.getPosition().y - 50, lander.getPosition().z);
+	cam.rotate(-45, glm::vec3(1, 0, 0));
+	cam.setDistance(500);
+	cam.setNearClip(.1);
+	cam.setFov(100);   // approx equivalent to 28mm in 35mm format
+	cam.disableMouseInput();
+	top.setNearClip(.1);
+	top.setFov(80);
+	trackCam.setPosition(200, 300, 500);
+	trackCam.setNearClip(.1);
+	trackCam.setFov(40);
+	
+	bExplode = false;
+	lander.setPosition(200, 300, 200);
+	lander.set_velocity(glm::vec3(-120, 20, -60));
+	lander.set_fuel(120);
+	lander.rotationX = 0;
+	lander.rotationY = 0;
+	lander.rotationZ = 0;
+	lander.updateHitbox();
+	score = 0;
+	gameState = IN_GAME;
 }
 
 //--------------------------------------------------------------
@@ -107,13 +119,14 @@ void ofApp::update() {
 	case MAIN_MENU:
 		break;
 	case IN_GAME:
-		explosion->update();
+		
 		checkDistToPath();
 		if (bLanderOut) {
-			cout << "Mission failed: Lander too far way from path" << endl;
+			cout << "Warning: Lander too far way from path" << endl;
 		}
 
 		landerLight.setPosition(lander.getPosition().x, lander.getPosition().y + 50, lander.getPosition().z);
+
 		// check input
 		if (inputHandler.getInputState(InputHandler::SPACE) && lander.get_fuel() > 0.0) {
 			lander.thrusterOn = true;
@@ -146,29 +159,28 @@ void ofApp::update() {
 
 		// collision check
 		if ((terrain.overlap(lander.getHitbox()) || lander.getAltitude(terrain) < 0)) {
-			if (lander.isUpright(lander.head())) {
-				glm::vec3 normal = glm::vec3(0, 1, 0);
-				glm::vec3 impulseForce = (2) * (glm::dot(-lander.get_velocity(), normal) * normal);
-				lander.addForce(impulseForce);
-			}
-			else if(!bExplode) {
+			glm::vec3 normal = glm::vec3(0, 1, 0);
+			glm::vec3 impulseForce = (2) * (glm::dot(-lander.get_velocity(), normal) * normal);
+			lander.addForce(impulseForce);
+			if (lander.isUpright(lander.head()) && glm::length(lander.get_velocity()) < 4.0f) {
+				score = int(lander.get_fuel() / 100 + 1000 - (glm::length(lander.get_velocity()) * 250));
+			} else if (!bExplode) {
 				explosion->setPosition(lander.getPosition());
 				explosion->sys->reset();
 				explosion->start();
 				lander.explode();
 				bExplode = true;
-				
+				score = 0;
 			}
-				
+			gameState = END_SCREEN;
+
 		} else {
 			lander.addForce(glm::vec3(0, -7, 0));
 		}
-
-		lander.update();
-
-		break;
 	case END_SCREEN:
-
+		landerLight.setPosition(lander.getPosition().x, lander.getPosition().y + 50, lander.getPosition().z);
+		explosion->update();
+		lander.update();
 		break;
 	}
 
@@ -183,6 +195,7 @@ void ofApp::draw() {
 		// draw welcome message
 		ofDrawBitmapString("Press ENTER to start the simulation.", ofGetWindowWidth() / 2 - 125, ofGetWindowHeight() / 2);
 		break;
+	case END_SCREEN:
 	case IN_GAME:
 		loadVbo();
 		ofPushMatrix();
@@ -193,7 +206,7 @@ void ofApp::draw() {
 		ofEnableDepthTest();
 		ofPopMatrix();
 		ofSetColor(255, 255, 255);
-		
+
 		theCam->begin();
 		//explosion.draw();
 		ofPushMatrix();
@@ -260,7 +273,7 @@ void ofApp::draw() {
 		explosion->draw();
 		//	ofNoFill();
 		if (explosion->started) {
-			
+
 			glDepthMask(GL_FALSE);
 
 			ofSetColor(ofColor::aquamarine);
@@ -300,21 +313,21 @@ void ofApp::draw() {
 		//cam.end();
 		theCam->end();
 
-		
+
 
 		glDepthMask(false);
-		gui.draw();
-		ofDrawBitmapString("Altitude (agl): " + std::to_string(lander.getAltitude(terrain)), ofGetWindowWidth() - 200, 15);
-		ofDrawBitmapString("Fuel remaining: " + std::to_string(lander.get_fuel()), ofGetWindowWidth() - 200, 30);
+		//gui.draw();
+		if (gameState == IN_GAME) {
+			ofDrawBitmapString("Altitude (agl): " + std::to_string(lander.getAltitude(terrain)), ofGetWindowWidth() - 200, 15);
+			ofDrawBitmapString("Fuel remaining: " + std::to_string(lander.get_fuel()), ofGetWindowWidth() - 200, 30);
+			ofDrawBitmapString("Speed: " + std::to_string(glm::length(lander.get_velocity())), ofGetWindowWidth() - 200, 45);
+		} else {
+			// draw end screen stuff
+			ofDrawBitmapString("Simulation over.", ofGetWindowWidth() / 2 - 75, ofGetWindowHeight() / 2);
+			// draw score
+			ofDrawBitmapString("Score: " + to_string(score), ofGetWindowWidth() / 2 - 50, ofGetWindowHeight() / 2 + 25);
+		}
 		glDepthMask(true);
-		break;
-	case END_SCREEN:
-		// draw end screen stuff
-		// draw end game message
-		//TODO: DRAW BASED ON RESULT
-		ofDrawBitmapString("Simulation over.", ofGetWindowWidth() / 2, ofGetWindowHeight() / 2);
-		// draw score
-		ofDrawBitmapString("Score:", ofGetWindowWidth() / 2, ofGetWindowHeight() / 2 + 100);
 		break;
 	}
 
@@ -472,7 +485,7 @@ void ofApp::keyPressed(int key) {
 		break;
 	case OF_KEY_RETURN:
 		if (gameState == MAIN_MENU) {
-			gameState = IN_GAME;
+			initGame();
 		} else if (gameState == END_SCREEN) {
 			gameState = MAIN_MENU;
 		}

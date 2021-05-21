@@ -20,16 +20,13 @@ protected:
 	glm::vec3 horizontalAxis = glm::vec3(1, 0, 0);
 	glm::vec3 normalAxis = glm::vec3(0, 0, 1);
 
-
-
-
-
-
 public:
 
 	// basic logic stuff
 	float fuel = 120.0;
 	float thrusterStartTime;
+	ofSoundPlayer thrusterSound;
+	
 	// thruster go brrrr
 	ParticleEmitter mainThruster;
 	ParticleEmitter explosion;
@@ -91,6 +88,7 @@ public:
 
 
 	void update();
+	void updateHitbox();
 
 	void draw();
 

@@ -18,6 +18,11 @@ EntityLander::EntityLander(string fileName) {
 	mainThruster.radius = .5;
 	mainThruster.setVelocity(ofVec3f(0, 0, 0));
 	mainThruster.start();
+
+	thrusterSound.load("geo/thruster.wav");
+	thrusterSound.setLoop(true);
+	thrusterSound.play();
+	thrusterSound.setPaused(true);
 }
 
 
@@ -27,9 +32,12 @@ EntityLander::EntityLander(string fileName) {
 
 
 void EntityLander::update() {
+	float finalVolume = 0;
+	
 	if (thrusterOn) {
 		mainThruster.setRate(10);
 		this->force += head() * 30;
+		finalVolume += 0.5;
 	} else {
 		mainThruster.setRate(0);
 	}
@@ -44,32 +52,46 @@ void EntityLander::update() {
 		this->force += back() * 10;
 	}
 	if (ZLthrusterOn) {
-
 		this->force -= back() * 10;
 	}
 
+
 	if (rotateXACW) {
 		torqueX += 100;
+		finalVolume += 0.05;
 	} else if (rotateXCW) {
 		torqueX -= 100;
+		finalVolume += 0.05;
 	} else if (!rotateXCW && !rotateXACW) {
 		torqueX = -rotationX / 2;
+		finalVolume += abs(rotationX) < 10 ? 0 : 0.05;
 	}
 	if (rotateYACW) {
 		torqueY += 100;
+		finalVolume += 0.05;
 	} else if (rotateYCW) {
 		torqueY -= 100;
+		finalVolume += 0.05;
 	} else if (!rotateYCW && !rotateYACW) {
 		torqueY = -rotationY / 2;
+		finalVolume += abs(rotationY) < 10 ? 0 : 0.05;
 	}
 	if (rotateZACW) {
 		torqueZ += 100;
+		finalVolume += 0.05;
 	} else if (rotateZCW) {
 		torqueZ -= 100;
+		finalVolume += 0.05;
 	} else if (!rotateZCW && !rotateZACW) {
 		torqueZ = -rotationZ / 2;
+		finalVolume += abs(rotationZ) < 10 ? 0 : 0.05;
 	}
 
+	thrusterSound.setVolume(finalVolume > 1 ? 1 : finalVolume);
+	thrusterSound.setPaused(finalVolume < 0.05);
+
+	// thruster sounds
+	
 	/*
 	if (rotationX >= 20) {
 		rotationX = 20;
@@ -90,6 +112,12 @@ void EntityLander::update() {
 	this->integrate();
 
 	// update the hitbox
+	updateHitbox();
+
+}
+
+
+void EntityLander::updateHitbox() {
 	glm::vec3 min = this->getSceneMin();
 	glm::vec3 max = this->getSceneMax();
 	glm::mat4 MrotZ = glm::rotate(glm::mat4(1.0), glm::radians(rotationZ), glm::vec3(0, 0, 1));
@@ -113,11 +141,7 @@ void EntityLander::update() {
 		max.z = temp;
 	}
 	hitbox = Box(glm::vec3(min.x, min.y, min.z), glm::vec3(max.x, max.y, max.z));
-
 }
-
-
-
 
 
 void EntityLander::loadVbo() {
