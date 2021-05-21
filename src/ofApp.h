@@ -84,8 +84,8 @@ public:
 	const float selectionRange = 4.0;
 
 	ofVbo vbo;
-	void loadVbo();
-
+	void loadExplodeVbo();
+	void loadEmitterVbo();
 
 	bool bLanderOut;
 	Box testBox;
