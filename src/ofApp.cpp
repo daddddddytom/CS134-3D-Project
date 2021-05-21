@@ -8,7 +8,7 @@
 //
 void ofApp::setup() {
 	ofBackground(ofColor::black);
-	
+
 	pathPoints = { glm::vec3(0, 0, 0), glm::vec3(0, 10, 0), glm::vec3(10, 50, 10), glm::vec3(20, 100, 20), glm::vec3(40, 200, 40), glm::vec3(80, 250, 80),
 		glm::vec3(160, 270, 160), glm::vec3(180, 290, 180), glm::vec3(200, 300, 200) };
 
@@ -101,7 +101,7 @@ void ofApp::initGame() {
 	trackCam.setPosition(200, 300, 500);
 	trackCam.setNearClip(.1);
 	trackCam.setFov(40);
-	
+
 	bExplode = false;
 	lander.setPosition(200, 300, 200);
 	lander.set_velocity(glm::vec3(-120, 20, -60));
@@ -159,8 +159,8 @@ void ofApp::update() {
 			glm::vec3 normal = glm::vec3(0, 1, 0);
 			glm::vec3 impulseForce = (2) * (glm::dot(-lander.get_velocity(), normal) * normal);
 			lander.addForce(impulseForce);
-			if (lander.isUpright(lander.head()) && glm::length(lander.get_velocity()) < 4.0f) {
-				score = int(lander.get_fuel() / 100 + 1000 - (glm::length(lander.get_velocity()) * 250));
+			if (lander.isUpright(lander.head()) && glm::length(lander.get_velocity()) < 3.0f) {
+				score = int(lander.get_fuel() / 100 + 1000 - (glm::length(lander.get_velocity()) * 500) + 100 - glm::length(pathPoints[pathPoints.size() - 1] - lander.getPosition()));
 			} else if (!bExplode) {
 				explosion->setPosition(lander.getPosition());
 				explosion->sys->reset();
@@ -177,7 +177,13 @@ void ofApp::update() {
 	case END_SCREEN:
 		landerLight.setPosition(lander.getPosition().x, lander.getPosition().y + 50, lander.getPosition().z);
 		explosion->update();
+		if (gameState != IN_GAME) {
+			lander.isActive = false;
+		} else {
+			lander.isActive = true;
+		}
 		lander.update();
+
 		break;
 	}
 
@@ -314,7 +320,7 @@ void ofApp::draw() {
 				minDistance = dis;
 			}
 		}
-		
+
 		ofPopMatrix();
 		//cam.end();
 		theCam->end();
@@ -331,10 +337,10 @@ void ofApp::draw() {
 			// draw score
 			ofDrawBitmapString("Score: " + to_string(score), ofGetWindowWidth() / 2 - 50, ofGetWindowHeight() / 2 + 25);
 			if (score < 2) {
-				ofDrawBitmapString("Landing Failed." + to_string(score), ofGetWindowWidth() / 2 - 75, ofGetWindowHeight() / 2 + 50);
-				ofDrawBitmapString("Mars Lander Damaged." + to_string(score), ofGetWindowWidth() / 2 - 75, ofGetWindowHeight() / 2 + 75);
+				ofDrawBitmapString("Landing Failed.", ofGetWindowWidth() / 2 - 75, ofGetWindowHeight() / 2 + 50);
+				ofDrawBitmapString("Mars Lander Damaged.", ofGetWindowWidth() / 2 - 75, ofGetWindowHeight() / 2 + 75);
 			} else {
-				ofDrawBitmapString("Landing Successful." + to_string(score), ofGetWindowWidth() / 2 - 75, ofGetWindowHeight() / 2 + 50);
+				ofDrawBitmapString("Landing Successful.", ofGetWindowWidth() / 2 - 75, ofGetWindowHeight() / 2 + 50);
 			}
 		}
 		glDepthMask(true);
@@ -673,6 +679,7 @@ void ofApp::mouseDragged(int x, int y, int button) {
 	glm::vec3 mouseDir = glm::normalize(mouseWorld - origin);
 	float distance;
 	if (bInDrag&&bLanderSelected) {
+		lander.set_velocity(glm::vec3(0, 0, 0));
 		glm::vec3 landerPos = lander.getPosition();
 		glm::vec3 mousePos = getMousePointOnPlane(landerPos, cam.getZAxis());
 		glm::vec3 delta = mousePos - mouseLastPos;

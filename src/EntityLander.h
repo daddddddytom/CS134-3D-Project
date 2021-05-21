@@ -43,6 +43,7 @@ public:
 	bool rotateYACW = false;
 	bool rotateYCW = false;
 	bool rotateNormal = false;
+	bool isActive = true;
 
 	//shader
 	ofVbo vbo;

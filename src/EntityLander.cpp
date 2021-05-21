@@ -25,73 +25,71 @@ EntityLander::EntityLander(string fileName) {
 	thrusterSound.setPaused(true);
 }
 
-
-
-
-
-
-
 void EntityLander::update() {
 	float finalVolume = 0;
-	
-	if (thrusterOn) {
-		mainThruster.setRate(10);
-		this->force += head() * 30;
-		finalVolume += 0.5;
+
+	if (isActive) {
+		if (thrusterOn) {
+			mainThruster.setRate(10);
+			this->force += head() * 10;
+			finalVolume += 0.5;
+		} else {
+			mainThruster.setRate(0);
+		}
+		if (XRthrusterOn) {
+			this->force += right() * 10;
+		}
+		if (XLthrusterOn) {
+			this->force -= right() * 10;
+		}
+		if (ZRthrusterOn) {
+
+			this->force += back() * 10;
+		}
+		if (ZLthrusterOn) {
+			this->force -= back() * 10;
+		}
+
+
+		if (rotateXACW) {
+			torqueX += 100;
+			finalVolume += 0.05;
+		} else if (rotateXCW) {
+			torqueX -= 100;
+			finalVolume += 0.05;
+		} else if (!rotateXCW && !rotateXACW) {
+			torqueX = -rotationX / 2;
+			finalVolume += abs(rotationX) < 10 ? 0 : 0.05;
+		}
+		if (rotateYACW) {
+			torqueY += 100;
+			finalVolume += 0.05;
+		} else if (rotateYCW) {
+			torqueY -= 100;
+			finalVolume += 0.05;
+		} else if (!rotateYCW && !rotateYACW) {
+			torqueY = -rotationY / 2;
+			finalVolume += abs(rotationY) < 10 ? 0 : 0.05;
+		}
+		if (rotateZACW) {
+			torqueZ += 100;
+			finalVolume += 0.05;
+		} else if (rotateZCW) {
+			torqueZ -= 100;
+			finalVolume += 0.05;
+		} else if (!rotateZCW && !rotateZACW) {
+			torqueZ = -rotationZ / 2;
+			finalVolume += abs(rotationZ) < 10 ? 0 : 0.05;
+		}
 	} else {
 		mainThruster.setRate(0);
-	}
-	if (XRthrusterOn) {
-		this->force += right() * 10;
-	}
-	if (XLthrusterOn) {
-		this->force -= right() * 10;
-	}
-	if (ZRthrusterOn) {
-
-		this->force += back() * 10;
-	}
-	if (ZLthrusterOn) {
-		this->force -= back() * 10;
-	}
-
-
-	if (rotateXACW) {
-		torqueX += 100;
-		finalVolume += 0.05;
-	} else if (rotateXCW) {
-		torqueX -= 100;
-		finalVolume += 0.05;
-	} else if (!rotateXCW && !rotateXACW) {
-		torqueX = -rotationX / 2;
-		finalVolume += abs(rotationX) < 10 ? 0 : 0.05;
-	}
-	if (rotateYACW) {
-		torqueY += 100;
-		finalVolume += 0.05;
-	} else if (rotateYCW) {
-		torqueY -= 100;
-		finalVolume += 0.05;
-	} else if (!rotateYCW && !rotateYACW) {
-		torqueY = -rotationY / 2;
-		finalVolume += abs(rotationY) < 10 ? 0 : 0.05;
-	}
-	if (rotateZACW) {
-		torqueZ += 100;
-		finalVolume += 0.05;
-	} else if (rotateZCW) {
-		torqueZ -= 100;
-		finalVolume += 0.05;
-	} else if (!rotateZCW && !rotateZACW) {
-		torqueZ = -rotationZ / 2;
-		finalVolume += abs(rotationZ) < 10 ? 0 : 0.05;
 	}
 
 	thrusterSound.setVolume(finalVolume > 1 ? 1 : finalVolume);
 	thrusterSound.setPaused(finalVolume < 0.05);
 
 	// thruster sounds
-	
+
 	/*
 	if (rotationX >= 20) {
 		rotationX = 20;
