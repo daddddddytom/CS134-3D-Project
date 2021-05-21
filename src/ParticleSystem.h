@@ -58,3 +58,11 @@ public:
 	void updateForce(Particle *);
 };
 
+
+class ImpulseRadialForce : public ParticleForce {
+	float magnitude;
+public:
+	ImpulseRadialForce(float magnitude);
+	void updateForce(Particle *);
+};
+

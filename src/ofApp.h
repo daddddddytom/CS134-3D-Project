@@ -4,6 +4,7 @@
 #include "Box.h"
 #include "Ray.h"
 #include "ParticleSystem.h"
+#include "ParticleEmitter.h"
 #include <glm/gtx/intersect.hpp>
 #include "EntityLander.h"
 #include "InputHandler.h"
@@ -80,12 +81,14 @@ public:
 
 	const float selectionRange = 4.0;
 
-	
+	ofVbo vbo;
+	void loadVbo();
+
 
 	bool bLanderOut;
 	Box testBox;
 	Box pathBox;
-	
+	bool bExplode = false;
 	glm::vec3  mouseLastPos;
 	bool bInDrag = false;
 	bool startEngine = false;
@@ -98,9 +101,13 @@ public:
 	TurbulenceForce* turbForce;
 	GravityForce* gravityForce;
 	ThrustForce* engineForce;
+	ParticleEmitter* explosion;
 
+	TurbulenceForce* turbulanceForce;
+	GravityForce* gravForce;
+	ImpulseRadialForce* radialForce;
 	InputHandler inputHandler;
 
 	ofImage background;
-
+	ofTexture  particleTex;
 };

@@ -22,6 +22,10 @@ void ofApp::setup() {
 #else
 	shader.load("shaders/shader");
 #endif
+	if (!ofLoadImage(particleTex, "images/dot.png")) {
+		cout << "Particle Texture File: images/dot.png not found" << endl;
+		ofExit();
+	}
 
 	bWireframe = false;
 	bDisplayPoints = false;
@@ -74,7 +78,25 @@ void ofApp::setup() {
 	ofLoadImage(texture, "geo/martianfloor.png");
 
 	gameState = MAIN_MENU;
-	lander.set_velocity(glm::vec3(-120, 0, -60));
+	//lander.set_velocity(glm::vec3(-120, 0, -60));
+
+	explosion = new ParticleEmitter();
+	turbulanceForce = new TurbulenceForce(ofVec3f(-20, -20, 0), ofVec3f(20, 20, 0));
+	gravForce = new GravityForce(ofVec3f(0, -20, 0));
+	radialForce = new ImpulseRadialForce(1000.0);
+	explosion->sys->addForce(turbulanceForce);
+	explosion->sys->addForce(gravForce);
+	explosion->sys->addForce(radialForce);
+	explosion->setVelocity(ofVec3f(200, 200, 0));
+	explosion->setOneShot(true);
+	explosion->setEmitterType(RadialEmitter);
+	explosion->setGroupSize(30);
+	explosion->setParticleRadius(1);
+	explosion->setLifespan(1);
+
+
+
+
 }
 
 //--------------------------------------------------------------
@@ -85,6 +107,7 @@ void ofApp::update() {
 	case MAIN_MENU:
 		break;
 	case IN_GAME:
+		explosion->update();
 		checkDistToPath();
 		if (bLanderOut) {
 			cout << "Mission failed: Lander too far way from path" << endl;
@@ -127,8 +150,16 @@ void ofApp::update() {
 				glm::vec3 normal = glm::vec3(0, 1, 0);
 				glm::vec3 impulseForce = (2) * (glm::dot(-lander.get_velocity(), normal) * normal);
 				lander.addForce(impulseForce);
-			} else
+			}
+			else if(!bExplode) {
+				explosion->setPosition(lander.getPosition());
+				explosion->sys->reset();
+				explosion->start();
 				lander.explode();
+				bExplode = true;
+				
+			}
+				
 		} else {
 			lander.addForce(glm::vec3(0, -7, 0));
 		}
@@ -153,6 +184,7 @@ void ofApp::draw() {
 		ofDrawBitmapString("Press ENTER to start the simulation.", ofGetWindowWidth() / 2 - 125, ofGetWindowHeight() / 2);
 		break;
 	case IN_GAME:
+		loadVbo();
 		ofPushMatrix();
 		ofDisableDepthTest();
 		ofSetColor(255, 255, 255);
@@ -161,9 +193,9 @@ void ofApp::draw() {
 		ofEnableDepthTest();
 		ofPopMatrix();
 		ofSetColor(255, 255, 255);
-
+		
 		theCam->begin();
-
+		//explosion.draw();
 		ofPushMatrix();
 		drawPath(lander.getHitbox());
 
@@ -225,17 +257,50 @@ void ofApp::draw() {
 		// recursively draw octree
 		//
 		ofDisableLighting();
+		explosion->draw();
 		//	ofNoFill();
+		if (explosion->started) {
+			
+			glDepthMask(GL_FALSE);
 
+			ofSetColor(ofColor::aquamarine);
+
+			// this makes everything look glowy :)
+			//
+			ofEnableBlendMode(OF_BLENDMODE_ADD);
+			ofEnablePointSprites();
+
+			// begin drawing in the camera
+			shader.begin();
+			//theCam->begin();
+
+			// draw particle emitter here..
+
+			particleTex.bind();
+
+			vbo.draw(GL_POINTS, 0, (int)explosion->sys->particles.size());
+			//explosion->draw();
+			particleTex.unbind();
+
+			//  end drawing in the camera
+			//
+			//theCam->end();
+			shader.end();
+
+			ofDisablePointSprites();
+			ofDisableBlendMode();
+			ofEnableAlphaBlending();
+
+			// set back the depth mask
+			//
+			glDepthMask(GL_TRUE);
+		}
 
 		ofPopMatrix();
 		//cam.end();
 		theCam->end();
-		shader.begin();
-		theCam->begin();
 
-		theCam->end();
-		shader.end();
+		
 
 		glDepthMask(false);
 		gui.draw();
@@ -256,6 +321,23 @@ void ofApp::draw() {
 
 }
 
+void ofApp::loadVbo() {
+	if (explosion->sys->particles.size() < 1) return;
+
+	vector<ofVec3f> sizes;
+	vector<ofVec3f> points;
+	for (int i = 0; i < explosion->sys->particles.size(); i++) {
+		points.push_back(explosion->sys->particles[i].position);
+		sizes.push_back(ofVec3f(explosion->particleRadius));
+	}
+
+
+
+	int total = (int)points.size();
+	vbo.clear();
+	vbo.setVertexData(&points[0], total, GL_STATIC_DRAW);
+	vbo.setNormalData(&sizes[0], total, GL_STATIC_DRAW);
+}
 // 
 
 // Draw an XYZ axis in RGB at world (0,0,0) for reference.

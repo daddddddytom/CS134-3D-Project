@@ -32,6 +32,7 @@ public:
 	float thrusterStartTime;
 	// thruster go brrrr
 	ParticleEmitter mainThruster;
+	ParticleEmitter explosion;
 	ThrustForce thrustforce = ThrustForce(head() * -10);
 	bool thrusterOn = false;
 	bool XLthrusterOn = false;
