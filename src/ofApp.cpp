@@ -167,7 +167,7 @@ void ofApp::update() {
 				explosion->start();
 				lander.explode();
 				bExplode = true;
-				score = 0;
+				score = -1000;
 			}
 			gameState = END_SCREEN;
 
@@ -338,7 +338,6 @@ void ofApp::draw() {
 			ofDrawBitmapString("Score: " + to_string(score), ofGetWindowWidth() / 2 - 50, ofGetWindowHeight() / 2 + 25);
 			if (score < 2) {
 				ofDrawBitmapString("Landing Failed.", ofGetWindowWidth() / 2 - 75, ofGetWindowHeight() / 2 + 50);
-				ofDrawBitmapString("Mars Lander Damaged.", ofGetWindowWidth() / 2 - 75, ofGetWindowHeight() / 2 + 75);
 			} else {
 				ofDrawBitmapString("Landing Successful.", ofGetWindowWidth() / 2 - 75, ofGetWindowHeight() / 2 + 50);
 			}
