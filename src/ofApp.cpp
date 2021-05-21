@@ -135,10 +135,10 @@ void ofApp::update() {
 			lander.thrusterOn = false;
 		}
 
-		lander.rotateZACW = inputHandler.getInputState(InputHandler::A);
-		lander.rotateZCW = inputHandler.getInputState(InputHandler::D);
-		lander.rotateXACW = inputHandler.getInputState(InputHandler::W);
-		lander.rotateXCW = inputHandler.getInputState(InputHandler::S);
+		lander.rotateZACW = inputHandler.getInputState(InputHandler::S);
+		lander.rotateZCW = inputHandler.getInputState(InputHandler::W);
+		lander.rotateXACW = inputHandler.getInputState(InputHandler::D);
+		lander.rotateXCW = inputHandler.getInputState(InputHandler::A);
 		lander.rotateYACW = inputHandler.getInputState(InputHandler::Q);
 		lander.rotateYCW = inputHandler.getInputState(InputHandler::E);
 		lander.XLthrusterOn = inputHandler.getInputState(InputHandler::LEFT);
@@ -333,13 +333,13 @@ void ofApp::draw() {
 			ofDrawBitmapString("Distance from path: " + std::to_string(minDistance), ofGetWindowWidth() - 200, 60);
 		} else {
 			// draw end screen stuff
-			ofDrawBitmapString("Simulation over.", ofGetWindowWidth() / 2 - 75, ofGetWindowHeight() / 2);
+			ofDrawBitmapString("Simulation over.", ofGetWindowWidth() / 2 - 75, ofGetWindowHeight() / 2 - 75);
 			// draw score
-			ofDrawBitmapString("Score: " + to_string(score), ofGetWindowWidth() / 2 - 50, ofGetWindowHeight() / 2 + 25);
+			ofDrawBitmapString("Score: " + to_string(score), ofGetWindowWidth() / 2 - 50, ofGetWindowHeight() / 2 - 50);
 			if (score < 0) {
-				ofDrawBitmapString("Landing Failed.", ofGetWindowWidth() / 2 - 75, ofGetWindowHeight() / 2 + 50);
+				ofDrawBitmapString("Landing Failed.", ofGetWindowWidth() / 2 - 75, ofGetWindowHeight() / 2 - 25);
 			} else {
-				ofDrawBitmapString("Landing Successful.", ofGetWindowWidth() / 2 - 75, ofGetWindowHeight() / 2 + 50);
+				ofDrawBitmapString("Landing Successful.", ofGetWindowWidth() / 2 - 75, ofGetWindowHeight() / 2 - 25);
 			}
 		}
 		glDepthMask(true);
