@@ -20,8 +20,10 @@ void ofApp::setup() {
 
 #ifdef TARGET_OPENGLES
 	shader.load("shaders_gles/shader");
+	cout << 2 << endl;
 #else
 	shader.load("shaders/shader");
+	cout << 3 << endl;
 #endif
 	if (!ofLoadImage(particleTex, "images/dot.png")) {
 		cout << "Particle Texture File: images/dot.png not found" << endl;
@@ -135,10 +137,10 @@ void ofApp::update() {
 			lander.thrusterOn = false;
 		}
 
-		lander.rotateZACW = inputHandler.getInputState(InputHandler::S);
-		lander.rotateZCW = inputHandler.getInputState(InputHandler::W);
-		lander.rotateXACW = inputHandler.getInputState(InputHandler::D);
-		lander.rotateXCW = inputHandler.getInputState(InputHandler::A);
+		lander.rotateZACW = inputHandler.getInputState(InputHandler::A);
+		lander.rotateZCW = inputHandler.getInputState(InputHandler::D);
+		lander.rotateXACW = inputHandler.getInputState(InputHandler::W);
+		lander.rotateXCW = inputHandler.getInputState(InputHandler::S);
 		lander.rotateYACW = inputHandler.getInputState(InputHandler::Q);
 		lander.rotateYCW = inputHandler.getInputState(InputHandler::E);
 		lander.XLthrusterOn = inputHandler.getInputState(InputHandler::LEFT);
@@ -167,7 +169,7 @@ void ofApp::update() {
 				explosion->start();
 				lander.explode();
 				bExplode = true;
-				score = -1000;
+				score = 0;
 			}
 			gameState = END_SCREEN;
 
@@ -200,7 +202,7 @@ void ofApp::draw() {
 		break;
 	case END_SCREEN:
 	case IN_GAME:
-		loadVbo();
+		//loadVbo();
 		ofPushMatrix();
 		ofDisableDepthTest();
 		ofSetColor(255, 255, 255);
@@ -216,6 +218,7 @@ void ofApp::draw() {
 
 		ofEnableLighting();              // shaded mode
 		terrain.drawFaces();
+		explosion->draw();
 		ofSetColor(110, 36, 3);
 		texture.bind();
 		plane.draw();
@@ -272,13 +275,13 @@ void ofApp::draw() {
 		// recursively draw octree
 		//
 		ofDisableLighting();
-		explosion->draw();
+		//explosion->draw();
 		//	ofNoFill();
 		if (explosion->started) {
-
+			loadExplodeVbo();
 			glDepthMask(GL_FALSE);
 
-			ofSetColor(ofColor::aquamarine);
+			
 
 			// this makes everything look glowy :)
 			//
@@ -294,6 +297,42 @@ void ofApp::draw() {
 			particleTex.bind();
 
 			vbo.draw(GL_POINTS, 0, (int)explosion->sys->particles.size());
+			//explosion->draw();
+			particleTex.unbind();
+
+			//  end drawing in the camera
+			//
+			//theCam->end();
+			shader.end();
+
+			ofDisablePointSprites();
+			ofDisableBlendMode();
+			ofEnableAlphaBlending();
+
+			// set back the depth mask
+			//
+			glDepthMask(GL_TRUE);
+		}
+		if (lander.mainThruster.started) {
+			loadEmitterVbo();
+			glDepthMask(GL_FALSE);
+
+
+
+			// this makes everything look glowy :)
+			//
+			ofEnableBlendMode(OF_BLENDMODE_ADD);
+			ofEnablePointSprites();
+
+			// begin drawing in the camera
+			shader.begin();
+			//theCam->begin();
+
+			// draw particle emitter here..
+
+			particleTex.bind();
+
+			vbo.draw(GL_POINTS, 0, (int)lander.mainThruster.sys->particles.size());
 			//explosion->draw();
 			particleTex.unbind();
 
@@ -333,13 +372,14 @@ void ofApp::draw() {
 			ofDrawBitmapString("Distance from path: " + std::to_string(minDistance), ofGetWindowWidth() - 200, 60);
 		} else {
 			// draw end screen stuff
-			ofDrawBitmapString("Simulation over.", ofGetWindowWidth() / 2 - 75, ofGetWindowHeight() / 2 - 75);
+			ofDrawBitmapString("Simulation over.", ofGetWindowWidth() / 2 - 75, ofGetWindowHeight() / 2);
 			// draw score
-			ofDrawBitmapString("Score: " + to_string(score), ofGetWindowWidth() / 2 - 50, ofGetWindowHeight() / 2 - 50);
-			if (score < 0) {
-				ofDrawBitmapString("Landing Failed.", ofGetWindowWidth() / 2 - 75, ofGetWindowHeight() / 2 - 25);
+			ofDrawBitmapString("Score: " + to_string(score), ofGetWindowWidth() / 2 - 50, ofGetWindowHeight() / 2 + 25);
+			if (score < 2) {
+				ofDrawBitmapString("Landing Failed.", ofGetWindowWidth() / 2 - 75, ofGetWindowHeight() / 2 + 50);
+				ofDrawBitmapString("Mars Lander Damaged.", ofGetWindowWidth() / 2 - 75, ofGetWindowHeight() / 2 + 75);
 			} else {
-				ofDrawBitmapString("Landing Successful.", ofGetWindowWidth() / 2 - 75, ofGetWindowHeight() / 2 - 25);
+				ofDrawBitmapString("Landing Successful.", ofGetWindowWidth() / 2 - 75, ofGetWindowHeight() / 2 + 50);
 			}
 		}
 		glDepthMask(true);
@@ -349,7 +389,7 @@ void ofApp::draw() {
 
 }
 
-void ofApp::loadVbo() {
+void ofApp::loadExplodeVbo() {
 	if (explosion->sys->particles.size() < 1) return;
 
 	vector<ofVec3f> sizes;
@@ -365,7 +405,29 @@ void ofApp::loadVbo() {
 	vbo.clear();
 	vbo.setVertexData(&points[0], total, GL_STATIC_DRAW);
 	vbo.setNormalData(&sizes[0], total, GL_STATIC_DRAW);
+	
 }
+
+void ofApp::loadEmitterVbo() {
+	if (lander.mainThruster.sys->particles.size() < 1) return;
+
+	vector<ofVec3f> sizes;
+	vector<ofVec3f> points;
+	for (int i = 0; i < lander.mainThruster.sys->particles.size(); i++) {
+		points.push_back(lander.mainThruster.sys->particles[i].position);
+		sizes.push_back(ofVec3f(lander.mainThruster.particleRadius));
+	}
+
+
+
+	int total = (int)points.size();
+	vbo.clear();
+	vbo.setVertexData(&points[0], total, GL_STATIC_DRAW);
+	vbo.setNormalData(&sizes[0], total, GL_STATIC_DRAW);
+
+}
+
+
 // 
 
 // Draw an XYZ axis in RGB at world (0,0,0) for reference.
@@ -679,11 +741,15 @@ void ofApp::mouseDragged(int x, int y, int button) {
 	float distance;
 	if (bInDrag&&bLanderSelected) {
 		lander.set_velocity(glm::vec3(0, 0, 0));
+		gravityForce->set(glm::vec3(0,0,0));
 		glm::vec3 landerPos = lander.getPosition();
 		glm::vec3 mousePos = getMousePointOnPlane(landerPos, cam.getZAxis());
 		glm::vec3 delta = mousePos - mouseLastPos;
 		landerPos += delta;
 		lander.setPosition(landerPos.x, landerPos.y, landerPos.z); mouseLastPos = mousePos;
+	}
+	else {
+		gravityForce->set(glm::vec3(0, -10, 0));
 	}
 
 	bool hit = glm::intersectRayPlane(origin, mouseDir, glm::vec3(0, 0, 0), camAxis, distance);
