@@ -12,7 +12,7 @@ glm::vec3 Terrain::intersect(const Ray& ray) {
 	if (octree.intersect(ray, octree.root, dummyNode)) {
 		return glm::vec3(dummyNode.box.center().x, dummyNode.box.max().y, dummyNode.box.center().z);
 	}
-	return glm::vec3(0, -1000, 0);
+	return glm::vec3(0, 0, 0);
 }
 
 bool Terrain::overlap(const Box& box) {
